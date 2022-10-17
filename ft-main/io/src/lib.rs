@@ -1,5 +1,4 @@
 #![no_std]
-use ft_logic_io::Action;
 use gstd::{prelude::*, ActorId};
 use primitive_types::H256;
 
@@ -7,12 +6,14 @@ use primitive_types::H256;
 pub enum FTokenAction {
     Message {
         transaction_id: u64,
-        payload: Action,
+        payload: Vec<u8>,
     },
     UpdateLogicContract {
         ft_logic_code_hash: H256,
         storage_code_hash: H256,
     },
+    GetBalance(ActorId),
+    Clear(H256),
     MigrateStorageAddresses,
 }
 
@@ -20,6 +21,7 @@ pub enum FTokenAction {
 pub enum FTokenEvent {
     Ok,
     Err,
+    Balance(u128),
 }
 
 #[derive(Encode, Decode, TypeInfo)]

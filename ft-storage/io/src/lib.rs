@@ -16,6 +16,13 @@ pub enum FTStorageAction {
         account: ActorId,
         amount: u128,
     },
+    Approve {
+        transaction_hash: H256,
+        msg_source: ActorId,
+        account: ActorId,
+        amount: u128,
+    },
+    Clear(H256),
 }
 
 #[derive(Encode, Decode, Clone, Debug, TypeInfo)]

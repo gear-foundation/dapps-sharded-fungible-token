@@ -3,13 +3,15 @@ use codec::Encode;
 use gstd::{prelude::*, ActorId};
 use primitive_types::H256;
 
-#[derive(Debug, Encode, Decode, TypeInfo, Clone, Copy)]
+#[derive(Debug, Encode, Decode, TypeInfo, Clone)]
 pub enum FTLogicAction {
     Message {
         transaction_hash: H256,
         account: ActorId,
-        payload: Action,
+        payload: Vec<u8>,
     },
+    GetBalance(ActorId),
+    Clear(H256),
     UpdateStorageCodeHash(H256),
     MigrateStorages,
 }
@@ -18,6 +20,7 @@ pub enum FTLogicAction {
 pub enum FTLogicEvent {
     Ok,
     Err,
+    Balance(u128),
 }
 
 #[derive(Encode, Debug, Decode, TypeInfo, Copy, Clone)]
@@ -26,9 +29,17 @@ pub enum Action {
         recipient: ActorId,
         amount: u128,
     },
+    Burn {
+        sender: ActorId,
+        amount: u128,
+    },
     Transfer {
         sender: ActorId,
         recipient: ActorId,
+        amount: u128,
+    },
+    Approve {
+        approved_account: ActorId,
         amount: u128,
     },
 }

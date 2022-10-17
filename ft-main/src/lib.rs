@@ -1,8 +1,10 @@
 #![no_std]
 use ft_logic_io::*;
 use ft_main_io::*;
-use gstd::{msg, prelude::*, prog::ProgramGenerator, ActorId};
+use gstd::{exec, msg, prelude::*, prog::ProgramGenerator, ActorId};
 use primitive_types::H256;
+
+const DELAY: u32 = 600_000;
 
 #[derive(Default)]
 struct FToken {
@@ -19,7 +21,7 @@ impl FToken {
     /// Arguments:
     /// * `transaction_id`: the id of the transaction indicated by the actor that has sent that message;
     /// * `payload`: the message payload that will be sent to the logic token contract
-    async fn message(&mut self, transaction_id: u64, payload: &Action) {
+    async fn message(&mut self, transaction_id: u64, payload: &Vec<u8>) {
         // Get the transaction hash from `msg::source` and `transaction_id`
         // Tracking the trandaction ids is a responsibility of the account or programs that sent that transaction.
         let transaction_hash = get_hash(&msg::source(), transaction_id);
@@ -29,6 +31,7 @@ impl FToken {
             None => {
                 // If transaction took place for the first time we set its status to `InProgress`
                 // and send message to the logic contract.
+                send_delayed_clear(transaction_hash);
                 self.transactions
                     .insert(transaction_hash, TransactionStatus::InProgress);
                 let result = self.send_message(transaction_hash, payload).await;
@@ -72,13 +75,13 @@ impl FToken {
         }
     }
 
-    async fn send_message(&self, transaction_hash: H256, payload: &Action) -> Result<(), ()> {
+    async fn send_message(&self, transaction_hash: H256, payload: &Vec<u8>) -> Result<(), ()> {
         let result = msg::send_for_reply_as::<_, FTLogicEvent>(
             self.ft_logic_id,
             FTLogicAction::Message {
                 transaction_hash,
                 account: msg::source(),
-                payload: *payload,
+                payload: payload.clone(),
             },
             0,
         )
@@ -87,15 +90,30 @@ impl FToken {
         match result {
             Ok(reply) => match reply {
                 FTLogicEvent::Ok => Ok(()),
-                FTLogicEvent::Err => Err(()),
+                _ => Err(()),
             },
             Err(_) => Err(()),
         }
     }
 
+    async fn get_balance(&self, account: &ActorId) {
+        let reply = msg::send_for_reply_as::<_, FTLogicEvent>(
+            self.ft_logic_id,
+            FTLogicAction::GetBalance(*account),
+            0,
+        )
+        .expect("Error in sending a message `FTLogicGetBalance")
+        .await
+        .expect("Unable to decode `FTLogicEvent");
+        if let FTLogicEvent::Balance(balance) = reply {
+            msg::reply(FTokenEvent::Balance(balance), 0)
+                .expect("Error in a reply `FTokenEvent::Balance`");
+        }
+    }
+
     fn update_logic_contract(&mut self, ft_logic_code_hash: H256, storage_code_hash: H256) {
         self.assert_admin();
-        let ft_logic_id = ProgramGenerator::create_program(
+        let (_message_id, ft_logic_id) = ProgramGenerator::create_program(
             ft_logic_code_hash.into(),
             InitFTLogic {
                 admin: msg::source(),
@@ -114,6 +132,10 @@ impl FToken {
             "Only admin can send that message"
         );
     }
+
+    fn clear(&mut self, transaction_hash: H256) {
+        self.transactions.remove(&transaction_hash);
+    }
 }
 
 #[gstd::async_main]
@@ -129,6 +151,8 @@ async fn main() {
             ft_logic_code_hash,
             storage_code_hash,
         } => ftoken.update_logic_contract(ft_logic_code_hash, storage_code_hash),
+        FTokenAction::Clear(transaction_hash) => ftoken.clear(transaction_hash),
+        FTokenAction::GetBalance(account) => ftoken.get_balance(&account).await,
         _ => {}
     };
 }
@@ -136,7 +160,7 @@ async fn main() {
 #[no_mangle]
 unsafe extern "C" fn init() {
     let init_config: InitFToken = msg::load().expect("Unable to decode `InitFToken`");
-    let ft_logic_id = ProgramGenerator::create_program(
+    let (_message_id, ft_logic_id) = ProgramGenerator::create_program(
         init_config.ft_logic_code_hash.into(),
         InitFTLogic {
             admin: msg::source(),
@@ -195,4 +219,14 @@ pub fn get_hash(account: &ActorId, transaction_id: u64) -> H256 {
     let account: Vec<u8> = <[u8; 32]>::from(*account).into();
     let transaction_id = transaction_id.to_be_bytes();
     sp_core_hashing::blake2_256(&[&account[..], &transaction_id[..]].concat()).into()
+}
+
+fn send_delayed_clear(transaction_hash: H256) {
+    msg::send_delayed(
+        exec::program_id(),
+        FTokenAction::Clear(transaction_hash),
+        0,
+        DELAY,
+    )
+    .expect("Error in sending a delayled message `FTStorageAction::Clear`");
 }

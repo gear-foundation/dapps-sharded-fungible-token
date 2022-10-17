@@ -1,7 +1,9 @@
 #![no_std]
 use ft_storage_io::*;
-use gstd::{msg, prelude::*, ActorId};
+use gstd::{debug, exec, msg, prelude::*, ActorId};
 use primitive_types::H256;
+
+const DELAY: u32 = 600_000;
 
 #[derive(Default)]
 struct FTStorage {
@@ -31,6 +33,8 @@ impl FTStorage {
             return;
         }
 
+        send_delayed_clear(transaction_hash);
+
         // increase balance
         self.balances
             .entry(*account)
@@ -38,7 +42,7 @@ impl FTStorage {
             .or_insert(amount);
 
         self.transaction_status.insert(transaction_hash, true);
-        msg::reply(FTStorageEvent::Ok, 0).expect("error in sending a reply `FTStorageEvent::Ok");
+        reply_ok();
     }
 
     fn decrease_balance(
@@ -58,6 +62,7 @@ impl FTStorage {
             return;
         }
 
+        send_delayed_clear(transaction_hash);
         // decrease balance
         if let Some(balance) = self.balances.get_mut(account) {
             if *balance >= amount {
@@ -71,17 +76,57 @@ impl FTStorage {
                     .get_mut(account)
                     .and_then(|m| m.get_mut(msg_source))
                 {
-                    *balance -= amount;
-                    *allowed_amount -= amount;
-                    self.transaction_status.insert(transaction_hash, true);
-                    reply_ok();
-                    return;
+                    if *allowed_amount >= amount {
+                        *balance -= amount;
+                        *allowed_amount -= amount;
+                        self.transaction_status.insert(transaction_hash, true);
+                        reply_ok();
+                        return;
+                    }
                 }
             }
         }
 
         self.transaction_status.insert(transaction_hash, false);
         reply_err();
+    }
+
+    fn approve(
+        &mut self,
+        transaction_hash: H256,
+        msg_source: &ActorId,
+        account: &ActorId,
+        amount: u128,
+    ) {
+        self.assert_ft_contract();
+
+        // check transaction status
+        if let Some(status) = self.transaction_status.get(&transaction_hash) {
+            match status {
+                true => reply_ok(),
+                false => reply_err(),
+            };
+            return;
+        }
+        send_delayed_clear(transaction_hash);
+
+        self.approvals
+            .entry(*msg_source)
+            .and_modify(|accounts| {
+                accounts
+                    .entry(*account)
+                    .and_modify(|allowed_amount| {
+                        *allowed_amount = (*allowed_amount).saturating_add(amount)
+                    })
+                    .or_insert_with(|| amount);
+            })
+            .or_insert_with(|| [(*account, amount)].into());
+
+        reply_ok();
+    }
+
+    fn clear(&mut self, transaction_hash: H256) {
+        self.transaction_status.remove(&transaction_hash);
     }
 
     fn assert_ft_contract(&self) {
@@ -109,6 +154,13 @@ unsafe extern "C" fn handle() {
             account,
             amount,
         } => storage.decrease_balance(transaction_hash, &msg_source, &account, amount),
+        FTStorageAction::Approve {
+            transaction_hash,
+            msg_source,
+            account,
+            amount,
+        } => storage.approve(transaction_hash, &msg_source, &account, amount),
+        FTStorageAction::Clear(transaction_hash) => storage.clear(transaction_hash),
     }
 }
 
@@ -152,4 +204,14 @@ fn reply_ok() {
 
 fn reply_err() {
     msg::reply(FTStorageEvent::Err, 0).expect("error in sending a reply `FTStorageEvent::Err");
+}
+
+fn send_delayed_clear(transaction_hash: H256) {
+    msg::send_delayed(
+        exec::program_id(),
+        FTStorageAction::Clear(transaction_hash),
+        0,
+        DELAY,
+    )
+    .expect("Error in sending a delayled message `FTStorageAction::Clear`");
 }

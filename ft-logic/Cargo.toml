@@ -15,7 +15,6 @@ hex = { version = "0.4.3", default-features = false, features = ["alloc"] }
 
 [dev-dependencies]
 gtest = { git = "https://github.com/gear-tech/gear.git" }
-gclient = { git = "https://github.com/gear-tech/gear.git" }
 tokio = { version = "1.21.2", features = ["full"] }
 
 [build-dependencies]

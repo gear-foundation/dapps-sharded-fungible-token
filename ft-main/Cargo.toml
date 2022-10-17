@@ -17,5 +17,5 @@ sp-core-hashing = { version = "4.0.0", default-features = false }
 gear-wasm-builder = { git = "https://github.com/gear-tech/gear.git" }
 
 [dev-dependencies]
-gclient = { git = "https://github.com/gear-tech/gear.git" }
+gtest = { git = "https://github.com/gear-tech/gear.git" }
 tokio = { version = "1.21.2", features = ["full"] }
