@@ -21,7 +21,7 @@ impl FToken {
     /// Arguments:
     /// * `transaction_id`: the id of the transaction indicated by the actor that has sent that message;
     /// * `payload`: the message payload that will be sent to the logic token contract
-    async fn message(&mut self, transaction_id: u64, payload: &Vec<u8>) {
+    async fn message(&mut self, transaction_id: u64, payload: &[u8]) {
         // Get the transaction hash from `msg::source` and `transaction_id`
         // Tracking the trandaction ids is a responsibility of the account or programs that sent that transaction.
         let transaction_hash = get_hash(&msg::source(), transaction_id);
@@ -75,13 +75,13 @@ impl FToken {
         }
     }
 
-    async fn send_message(&self, transaction_hash: H256, payload: &Vec<u8>) -> Result<(), ()> {
+    async fn send_message(&self, transaction_hash: H256, payload: &[u8]) -> Result<(), ()> {
         let result = msg::send_for_reply_as::<_, FTLogicEvent>(
             self.ft_logic_id,
             FTLogicAction::Message {
                 transaction_hash,
                 account: msg::source(),
-                payload: payload.clone(),
+                payload: payload.to_vec(),
             },
             0,
         )

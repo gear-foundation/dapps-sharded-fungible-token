@@ -1,6 +1,6 @@
 #![no_std]
 use ft_storage_io::*;
-use gstd::{debug, exec, msg, prelude::*, ActorId};
+use gstd::{exec, msg, prelude::*, ActorId};
 use primitive_types::H256;
 
 const DELAY: u32 = 600_000;

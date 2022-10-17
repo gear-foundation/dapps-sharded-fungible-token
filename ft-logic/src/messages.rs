@@ -94,8 +94,8 @@ pub async fn get_balance(storage_id: &ActorId, account: &ActorId) -> u128 {
     .await
     .expect("Unable to decode `FTStorageEvent");
     if let FTStorageEvent::Balance(balance) = reply {
-        return balance;
+        balance
     } else {
-        return 0;
+        0
     }
 }

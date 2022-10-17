@@ -1,7 +1,7 @@
 use ft_logic_io::{Action, FTLogicEvent};
 use ft_main_io::*;
 use gstd::prelude::*;
-use gtest::{Program, RunResult, System};
+use gtest::{Program, System};
 pub trait FToken {
     fn ftoken(system: &System) -> Program;
     fn mint(&self, transaction_id: u64, from: u64, account: u64, amount: u128, error: bool);

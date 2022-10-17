@@ -110,7 +110,6 @@ fn approve() {
     let sender: u64 = 100;
     let recipient: u64 = 200;
     let approved_account: u64 = 300;
-    let wrong_account: u64 = 101;
     let amount: u128 = 100_000;
     let ftoken = Program::ftoken(&system);
 
@@ -168,9 +167,9 @@ fn approve() {
         false,
     );
 
-     // check balance
-     ftoken.check_balance(sender, amount - amount / 10 - amount / 2);
-     ftoken.check_balance(recipient, amount / 10 + amount / 2);
+    // check balance
+    ftoken.check_balance(sender, amount - amount / 10 - amount / 2);
+    ftoken.check_balance(recipient, amount / 10 + amount / 2);
 
     // approve one more time for burn
     ftoken.approve(
@@ -181,15 +180,14 @@ fn approve() {
         false,
     );
 
-     // must fail since sender has no enough tokens
-     ftoken.burn(
+    // must fail since sender has no enough tokens
+    ftoken.burn(
         transaction_id + 7,
         approved_account,
         sender,
         amount / 10,
         false,
     );
-    
-   ftoken.check_balance(sender, amount - amount / 5 - amount / 2);
 
+    ftoken.check_balance(sender, amount - amount / 5 - amount / 2);
 }

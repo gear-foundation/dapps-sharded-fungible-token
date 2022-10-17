@@ -35,7 +35,7 @@ impl FTLogic {
     /// * `transaction_hash`: the hash associated with that transaction;
     /// * `account`: the account that sent the message to the main contract;
     /// * `action`: the message payload.
-    async fn message(&mut self, transaction_hash: H256, account: &ActorId, payload: &Vec<u8>) {
+    async fn message(&mut self, transaction_hash: H256, account: &ActorId, payload: &[u8]) {
         self.assert_main_contract();
         let action = Action::decode(&mut &payload[..]).expect("Can't decode `Action`");
         let transaction_status = self
