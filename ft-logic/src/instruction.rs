@@ -41,17 +41,11 @@ impl Instruction {
                         .expect("Error in sending a message in instruction")
                         .await;
                 match result {
-                    Ok(storage_event) => match storage_event {
-                        FTStorageEvent::Ok => {
-                            self.state = InstructionState::ScheduledAbort;
-                            Ok(())
-                        }
-                        _ => {
-                            self.state = InstructionState::RunWithError;
-                            Err(())
-                        }
-                    },
-                    Err(_) => {
+                    Ok(FTStorageEvent::Ok) => {
+                        self.state = InstructionState::ScheduledAbort;
+                        Ok(())
+                    }
+                    _ => {
                         self.state = InstructionState::RunWithError;
                         Err(())
                     }
@@ -74,14 +68,11 @@ impl Instruction {
                 .expect("Error in sending a compensation message in instruction")
                 .await;
                 match result {
-                    Ok(storage_event) => match storage_event {
-                        FTStorageEvent::Ok => {
-                            self.state = InstructionState::Finished;
-                            Ok(())
-                        }
-                        _ => Err(()),
-                    },
-                    Err(_) => Err(()),
+                    Ok(FTStorageEvent::Ok) => {
+                        self.state = InstructionState::Finished;
+                        Ok(())
+                    }
+                    _ => Err(()),
                 }
             }
             InstructionState::Finished => Ok(()),

@@ -84,6 +84,36 @@ pub async fn approve(
     }
 }
 
+pub async fn transfer(
+    transaction_hash: H256,
+    storage_id: &ActorId,
+    msg_source: &ActorId,
+    sender: &ActorId,
+    recipient: &ActorId,
+    amount: u128,
+) -> Result<(), ()> {
+    let result = msg::send_for_reply_as::<_, FTStorageEvent>(
+        *storage_id,
+        FTStorageAction::Transfer {
+            transaction_hash,
+            msg_source: *msg_source,
+            sender: *sender,
+            recipient: *recipient,
+            amount,
+        },
+        0,
+    )
+    .expect("Error in sending a message `FTStorageAction::Transfer`")
+    .await;
+    match result {
+        Ok(storage_event) => match storage_event {
+            FTStorageEvent::Ok => Ok(()),
+            _ => Err(()),
+        },
+        Err(_) => Err(()),
+    }
+}
+
 pub async fn get_balance(storage_id: &ActorId, account: &ActorId) -> u128 {
     let reply = msg::send_for_reply_as::<_, FTStorageEvent>(
         *storage_id,

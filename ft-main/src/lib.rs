@@ -88,11 +88,8 @@ impl FToken {
         .expect("Error in sending a message to the fungible logic contract")
         .await;
         match result {
-            Ok(reply) => match reply {
-                FTLogicEvent::Ok => Ok(()),
-                _ => Err(()),
-            },
-            Err(_) => Err(()),
+            Ok(FTLogicEvent::Ok) => Ok(()),
+            _ => Err(()),
         }
     }
 
@@ -216,9 +213,9 @@ gstd::metadata! {
 }
 
 pub fn get_hash(account: &ActorId, transaction_id: u64) -> H256 {
-    let account: Vec<u8> = <[u8; 32]>::from(*account).into();
+    let account: [u8; 32] = (*account).into();
     let transaction_id = transaction_id.to_be_bytes();
-    sp_core_hashing::blake2_256(&[&account[..], &transaction_id[..]].concat()).into()
+    sp_core_hashing::blake2_256(&[account.as_slice(), transaction_id.as_slice()].concat()).into()
 }
 
 fn send_delayed_clear(transaction_hash: H256) {

@@ -22,6 +22,13 @@ pub enum FTStorageAction {
         account: ActorId,
         amount: u128,
     },
+    Transfer {
+        transaction_hash: H256,
+        msg_source: ActorId,
+        sender: ActorId,
+        recipient: ActorId,
+        amount: u128,
+    },
     Clear(H256),
 }
 

@@ -21,6 +21,65 @@ impl FTStorage {
         msg::reply(FTStorageEvent::Balance(*balance), 0).expect("");
     }
 
+    fn decrease(&mut self, msg_source: &ActorId, sender: &ActorId, amount: u128) -> bool {
+        if let Some(balance) = self.balances.get_mut(sender) {
+            if *balance >= amount {
+                if msg_source == sender {
+                    *balance -= amount;
+                    return true;
+                } else if let Some(allowed_amount) = self
+                    .approvals
+                    .get_mut(sender)
+                    .and_then(|m| m.get_mut(msg_source))
+                {
+                    if *allowed_amount >= amount {
+                        *balance -= amount;
+                        *allowed_amount -= amount;
+                        return true;
+                    }
+                }
+            }
+        }
+        false
+    }
+    fn transfer(
+        &mut self,
+        transaction_hash: H256,
+        msg_source: &ActorId,
+        sender: &ActorId,
+        recipient: &ActorId,
+        amount: u128,
+    ) {
+        self.assert_ft_contract();
+
+        // check transaction status
+        if let Some(status) = self.transaction_status.get(&transaction_hash) {
+            match status {
+                true => reply_ok(),
+                false => reply_err(),
+            };
+            return;
+        }
+
+        send_delayed_clear(transaction_hash);
+
+        match self.decrease(msg_source, sender, amount) {
+            true => {
+                self.balances
+                    .entry(*recipient)
+                    .and_modify(|balance| *balance = (*balance).saturating_add(amount))
+                    .or_insert(amount);
+
+                self.transaction_status.insert(transaction_hash, true);
+                reply_ok();
+            }
+            false => {
+                self.transaction_status.insert(transaction_hash, false);
+                reply_err();
+            }
+        }
+    }
+
     fn increase_balance(&mut self, transaction_hash: H256, account: &ActorId, amount: u128) {
         self.assert_ft_contract();
 
@@ -64,31 +123,16 @@ impl FTStorage {
 
         send_delayed_clear(transaction_hash);
         // decrease balance
-        if let Some(balance) = self.balances.get_mut(account) {
-            if *balance >= amount {
-                if msg_source == account {
-                    *balance -= amount;
-                    self.transaction_status.insert(transaction_hash, true);
-                    reply_ok();
-                    return;
-                } else if let Some(allowed_amount) = self
-                    .approvals
-                    .get_mut(account)
-                    .and_then(|m| m.get_mut(msg_source))
-                {
-                    if *allowed_amount >= amount {
-                        *balance -= amount;
-                        *allowed_amount -= amount;
-                        self.transaction_status.insert(transaction_hash, true);
-                        reply_ok();
-                        return;
-                    }
-                }
+        match self.decrease(msg_source, account, amount) {
+            true => {
+                self.transaction_status.insert(transaction_hash, true);
+                reply_ok();
+            }
+            false => {
+                self.transaction_status.insert(transaction_hash, false);
+                reply_err();
             }
         }
-
-        self.transaction_status.insert(transaction_hash, false);
-        reply_err();
     }
 
     fn approve(
@@ -160,6 +204,13 @@ unsafe extern "C" fn handle() {
             account,
             amount,
         } => storage.approve(transaction_hash, &msg_source, &account, amount),
+        FTStorageAction::Transfer {
+            transaction_hash,
+            msg_source,
+            sender,
+            recipient,
+            amount,
+        } => storage.transfer(transaction_hash, &msg_source, &sender, &recipient, amount),
         FTStorageAction::Clear(transaction_hash) => storage.clear(transaction_hash),
     }
 }

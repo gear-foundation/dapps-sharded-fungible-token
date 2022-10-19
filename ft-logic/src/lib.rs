@@ -51,6 +51,8 @@ impl FTLogic {
             // Or there was not enough gas to change the `TransactionStatus`.
             TransactionStatus::InProgress => {
                 send_delayed_clear(transaction_hash);
+                self.transaction_status
+                    .insert(transaction_hash, TransactionStatus::InProgress);
                 match action {
                     Action::Mint { recipient, amount } => {
                         self.mint(transaction_hash, &recipient, amount).await;
@@ -79,8 +81,6 @@ impl FTLogic {
     }
 
     async fn mint(&mut self, transaction_hash: H256, recipient: &ActorId, amount: u128) {
-        self.transaction_status
-            .insert(transaction_hash, TransactionStatus::InProgress);
         let recipient_storage = self.get_storage_address(recipient);
 
         let result =
@@ -107,8 +107,6 @@ impl FTLogic {
         sender: &ActorId,
         amount: u128,
     ) {
-        self.transaction_status
-            .insert(transaction_hash, TransactionStatus::InProgress);
         let sender_storage = self.get_storage_address(sender);
 
         let result =
@@ -136,12 +134,23 @@ impl FTLogic {
         recipient: &ActorId,
         amount: u128,
     ) {
-        self.transaction_status
-            .insert(transaction_hash, TransactionStatus::InProgress);
         let sender_storage = self.get_storage_address(sender);
         let recipient_storage = self.get_storage_address(recipient);
 
-        self.instructions
+        if recipient_storage == sender_storage {
+            self.transfer_single_storage(
+                transaction_hash,
+                &sender_storage,
+                msg_source,
+                sender,
+                recipient,
+                amount,
+            )
+            .await;
+            return;
+        }
+        let (decrease_instruction, increase_instruction) = self
+            .instructions
             .entry(transaction_hash)
             .or_insert_with(|| {
                 let decrease_instruction = create_decrease_instruction(
@@ -159,11 +168,6 @@ impl FTLogic {
                 );
                 (decrease_instruction, increase_instruction)
             });
-
-        let (decrease_instruction, increase_instruction) = self
-            .instructions
-            .get_mut(&transaction_hash)
-            .expect("Can't be `None`: Instructions must exist");
 
         if decrease_instruction.start().await.is_err() {
             self.transaction_status
@@ -184,6 +188,39 @@ impl FTLogic {
                 self.transaction_status
                     .insert(transaction_hash, TransactionStatus::Success);
                 reply_ok();
+            }
+        }
+    }
+
+    async fn transfer_single_storage(
+        &mut self,
+        transaction_hash: H256,
+        storage_id: &ActorId,
+        msg_source: &ActorId,
+        sender: &ActorId,
+        recipient: &ActorId,
+        amount: u128,
+    ) {
+        let result = transfer(
+            transaction_hash,
+            storage_id,
+            msg_source,
+            sender,
+            recipient,
+            amount,
+        )
+        .await;
+
+        match result {
+            Ok(()) => {
+                self.transaction_status
+                    .insert(transaction_hash, TransactionStatus::Success);
+                reply_ok()
+            }
+            Err(()) => {
+                self.transaction_status
+                    .insert(transaction_hash, TransactionStatus::Failure);
+                reply_err();
             }
         }
     }
@@ -264,15 +301,17 @@ impl FTLogic {
     }
 
     fn assert_main_contract(&self) {
-        assert!(
-            self.ftoken_id == msg::source(),
+        assert_eq!(
+            self.ftoken_id,
+            msg::source(),
             "Only main fungible token contract can send that message"
         );
     }
 
     fn assert_admin(&self) {
-        assert!(
-            self.admin == msg::source(),
+        assert_eq!(
+            self.admin,
+            msg::source(),
             "Only admin can send that message"
         );
     }
