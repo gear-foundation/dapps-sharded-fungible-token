@@ -34,13 +34,14 @@ impl FToken {
                 send_delayed_clear(transaction_hash);
                 self.transactions
                     .insert(transaction_hash, TransactionStatus::InProgress);
-                send_message_then_reply(transaction_hash, payload).await;
-                let result = self.send_message(transaction_hash, payload).await;
+                self.send_message_then_reply(transaction_hash, payload)
+                    .await;
             }
             // The case when there was not enough gas to process the result of the message to the logic contract.
             Some(transaction_status) => match transaction_status {
                 TransactionStatus::InProgress => {
-                    send_message_then_reply(transaction_hash, payload).await;
+                    self.send_message_then_reply(transaction_hash, payload)
+                        .await;
                 }
                 TransactionStatus::Success => {
                     reply_ok();
@@ -52,7 +53,7 @@ impl FToken {
         }
     }
 
-    async fn send_message_then_reply(&mut self, transaction_hash: H256, payload: &Action) {
+    async fn send_message_then_reply(&mut self, transaction_hash: H256, payload: &[u8]) {
         let result = self.send_message(transaction_hash, payload).await;
         match result {
             Ok(()) => {
@@ -67,7 +68,7 @@ impl FToken {
             }
         };
     }
-    
+
     async fn send_message(&self, transaction_hash: H256, payload: &[u8]) -> Result<(), ()> {
         let result = msg::send_for_reply_as::<_, FTLogicEvent>(
             self.ft_logic_id,
