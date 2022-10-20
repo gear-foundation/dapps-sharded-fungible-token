@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-codec = { package = "parity-scale-codec", version = "3.1.2", default-features = false, features = ["derive", "full"] }
-gstd = { git = "https://github.com/gear-tech/gear.git", features = ["debug"] }
-scale-info = { version = "2.0.1", default-features = false, features = ["derive"] }
-primitive-types = { version = "0.11.1", default-features = false, features = ["scale-info"]}
+codec = { package = "parity-scale-codec", version = "3.1.2", default-features = false }
+gstd = { git = "https://github.com/gear-tech/gear.git" }
+scale-info = { version = "2.0.1", default-features = false }
+primitive-types = { version = "0.11.1", default-features = false }

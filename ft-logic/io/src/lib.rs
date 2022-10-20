@@ -1,5 +1,4 @@
 #![no_std]
-use codec::Encode;
 use gstd::{prelude::*, ActorId};
 use primitive_types::H256;
 
