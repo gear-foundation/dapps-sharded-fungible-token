@@ -1,6 +1,6 @@
 #![no_std]
 use ft_storage_io::*;
-use gstd::{exec, debug,  msg, prelude::*, ActorId};
+use gstd::{exec, msg, prelude::*, ActorId};
 use primitive_types::H256;
 
 const DELAY: u32 = 600_000;
@@ -182,9 +182,6 @@ impl FTStorage {
 
 #[no_mangle]
 unsafe extern "C" fn handle() {
-    debug!("!!!!!!!!!!!!!");
-    debug!("HANDLE STORAGE");
-    debug!("!!!!!!!!!!!!!");
     let action: FTStorageAction = msg::load().expect("Error in loading `StorageAction`");
     let storage: &mut FTStorage = FT_STORAGE.get_or_insert(Default::default());
     match action {
@@ -205,7 +202,7 @@ unsafe extern "C" fn handle() {
             msg_source,
             account,
             amount,
-        } => storage.approve(transaction_hash, &msg_source, &account, amount), 
+        } => storage.approve(transaction_hash, &msg_source, &account, amount),
         FTStorageAction::Transfer {
             transaction_hash,
             msg_source,
@@ -215,14 +212,10 @@ unsafe extern "C" fn handle() {
         } => storage.transfer(transaction_hash, &msg_source, &sender, &recipient, amount),
         FTStorageAction::Clear(transaction_hash) => storage.clear(transaction_hash),
     }
-    debug!("HANDLE STORAGE END");
-    debug!("!!!!!!!!!!!!!");
 }
 
 #[no_mangle]
 unsafe extern "C" fn init() {
-    debug!("INIT STORAGE");
-    debug!("!!!!!!!!!!!!!");
     let storage = FTStorage {
         ft_logic_id: msg::source(),
         ..Default::default()
@@ -271,9 +264,4 @@ fn send_delayed_clear(transaction_hash: H256) {
         DELAY,
     )
     .expect("Error in sending a delayled message `FTStorageAction::Clear`");
-}
-
-#[no_mangle]
-unsafe extern "C" fn handle_signal() {
-    debug!("HERE FT STORAGE");
 }

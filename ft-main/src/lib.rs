@@ -1,7 +1,7 @@
 #![no_std]
 use ft_logic_io::*;
 use ft_main_io::*;
-use gstd::{debug, exec, msg, prelude::*, prog::ProgramGenerator, ActorId};
+use gstd::{exec, msg, prelude::*, prog::ProgramGenerator, ActorId};
 use primitive_types::H256;
 
 const DELAY: u32 = 600_000;
@@ -27,7 +27,6 @@ impl FToken {
         let transaction_hash = get_hash(&msg::source(), transaction_id);
         let transaction = self.transactions.get(&transaction_hash);
 
-        debug!("TRANSACTION_ID {:?}", transaction_id);
         match transaction {
             None => {
                 // If transaction took place for the first time we set its status to `InProgress`
@@ -56,7 +55,6 @@ impl FToken {
 
     async fn send_message_then_reply(&mut self, transaction_hash: H256, payload: &[u8]) {
         let result = self.send_message(transaction_hash, payload).await;
-        debug!("payload {:?}", payload);
         match result {
             Ok(()) => {
                 self.transactions
@@ -135,7 +133,6 @@ impl FToken {
 #[gstd::async_main]
 async fn main() {
     let action: FTokenAction = msg::load().expect("Unable to decode `FTokenAction`");
-    debug!("ACTION {:?}", action);
     let ftoken: &mut FToken = unsafe { FTOKEN.get_or_insert(Default::default()) };
     match action {
         FTokenAction::Message {
@@ -154,7 +151,6 @@ async fn main() {
 
 #[no_mangle]
 unsafe extern "C" fn init() {
-    debug!("INIT FT !!!!");
     let init_config: InitFToken = msg::load().expect("Unable to decode `InitFToken`");
     let hash: [u8; 32] = init_config.ft_logic_code_hash.into();
     let (_message_id, ft_logic_id) = ProgramGenerator::create_program(
@@ -226,9 +222,4 @@ fn send_delayed_clear(transaction_hash: H256) {
         DELAY,
     )
     .expect("Error in sending a delayled message `FTStorageAction::Clear`");
-}
-
-#[no_mangle]
-unsafe extern "C" fn handle_signal() {
-    debug!("HERE FT MAIN");
 }

@@ -1,6 +1,6 @@
 #![no_std]
 use ft_logic_io::*;
-use gstd::{debug, exec, msg, prelude::*, prog::ProgramGenerator, ActorId};
+use gstd::{exec, msg, prelude::*, prog::ProgramGenerator, ActorId};
 mod instruction;
 use instruction::*;
 mod messages;
@@ -38,7 +38,6 @@ impl FTLogic {
     async fn message(&mut self, transaction_hash: H256, account: &ActorId, payload: &[u8]) {
         self.assert_main_contract();
         let action = Action::decode(&mut &payload[..]).expect("Can't decode `Action`");
-        debug!("ACTION {:?}", action);
         let transaction_status = self
             .transaction_status
             .get(&transaction_hash)
@@ -272,15 +271,10 @@ impl FTLogic {
             *address
         } else {
             let hash: [u8; 32] = self.storage_code_hash.into();
-            let (_message_id, address) = ProgramGenerator::create_program_with_gas(
-                hash.into(),
-                "",
-                GAS_STORAGE_CREATION,
-                0,
-            )
-            .expect("Error in creating Storage program");
+            let (_message_id, address) =
+                ProgramGenerator::create_program_with_gas(hash.into(), "", GAS_STORAGE_CREATION, 0)
+                    .expect("Error in creating Storage program");
             self.id_to_storage.insert(id, address);
-            debug!("STORAGE ADDRESS {:?}", address);
             address
         }
     }
@@ -321,7 +315,6 @@ impl FTLogic {
 
 #[gstd::async_main]
 async fn main() {
-    debug!("HANDLE LOGIC");
     let action: FTLogicAction = msg::load().expect("Error in loading `StorageAction`");
     let logic: &mut FTLogic = unsafe { FT_LOGIC.get_or_insert(Default::default()) };
     match action {
@@ -341,7 +334,6 @@ async fn main() {
 
 #[no_mangle]
 unsafe extern "C" fn init() {
-    debug!("INIT LOGIC");
     let init_config: InitFTLogic = msg::load().expect("Unable to decode `InitFTLogic`");
     let ft_logic = FTLogic {
         admin: init_config.admin,
@@ -384,7 +376,7 @@ unsafe extern "C" fn meta_state() -> *mut [i32; 2] {
 
 gstd::metadata! {
     title: "Logic Fungible Token contract",
-    init: 
+    init:
         input: InitFTLogic,
     handle:
         input: FTLogicAction,
@@ -392,9 +384,4 @@ gstd::metadata! {
     state:
         input: FTLogicState,
         output: FTLogicStateReply,
-}
-
-#[no_mangle]
-unsafe extern "C" fn handle_signal() {
-    debug!("HERE FT LOGIC");
 }

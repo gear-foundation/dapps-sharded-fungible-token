@@ -1,8 +1,7 @@
 pub mod utils;
+use gstd::prelude::*;
 use gtest::{Program, System};
 use utils::*;
-use ft_logic_io::{Action};
-use gstd::{prelude::*};
 
 #[test]
 fn mint() {
@@ -193,30 +192,3 @@ fn approve() {
 
     ftoken.check_balance(sender, amount - amount / 5 - amount / 2);
 }
-
-
-// #[test]
-// fn transfer_idea() {
-//     let system = System::new();
-//     system.init_logger();
-//     let transaction_id: u64 = 0;
-//     let sender: [u8; 32] =
-//     hex_literal::hex!("ca5a7714cbffc0d53e58f9bf7ccf8ecd25bd5b9cb1285b417abecf490cf77677");
-//     let recipient: [u8; 32] =
-//     hex_literal::hex!("723f29f1ef4b54414ea643635c44ff3ca8ca93888a55ae54bae0a9cf90521440");
-//     let amount: u128 = 100_000;
-//     let ftoken = Program::ftoken(&system);
-
-//     let payload = Action::Mint {
-//         recipient: sender.into(),
-//         amount,
-//     }.encode();
-//     println!("{:?}", payload);
-
-//     let payload = Action::Transfer {
-//         sender: sender.into(),
-//         recipient: recipient.into(),
-//         amount,
-//     }.encode();
-//     println!("{:?}", payload);
-// }

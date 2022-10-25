@@ -124,15 +124,16 @@ dependencies = [
 
 [[package]]
 name = "cargo_metadata"
-version = "0.15.0"
+version = "0.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3abb7553d5b9b8421c6de7cb02606ff15e0c6eea7d8eadd75ef013fd636bec36"
+checksum = "406c859255d568f4f742b3146d51851f3bfd49f734a2c289d9107c4395ee0062"
 dependencies = [
  "camino",
  "cargo-platform",
  "semver",
  "serde",
  "serde_json",
+ "thiserror",
 ]
 
 [[package]]
@@ -385,7 +386,7 @@ dependencies = [
 [[package]]
 name = "galloc"
 version = "0.1.0"
-source = "git+https://github.com/gear-tech/gear.git#dd1eb4a384327647fe61196e3aa6ceb2f7607adb"
+source = "git+https://github.com/gear-tech/gear.git#d7d4727a3a042925e7f53f4cfa8e37b66e5d717a"
 dependencies = [
  "dlmalloc",
 ]
@@ -393,7 +394,7 @@ dependencies = [
 [[package]]
 name = "gcore"
 version = "0.1.0"
-source = "git+https://github.com/gear-tech/gear.git#dd1eb4a384327647fe61196e3aa6ceb2f7607adb"
+source = "git+https://github.com/gear-tech/gear.git#d7d4727a3a042925e7f53f4cfa8e37b66e5d717a"
 dependencies = [
  "gear-core-errors",
  "parity-scale-codec",
@@ -403,7 +404,7 @@ dependencies = [
 [[package]]
 name = "gear-backend-common"
 version = "0.1.0"
-source = "git+https://github.com/gear-tech/gear.git#dd1eb4a384327647fe61196e3aa6ceb2f7607adb"
+source = "git+https://github.com/gear-tech/gear.git#d7d4727a3a042925e7f53f4cfa8e37b66e5d717a"
 dependencies = [
  "derive_more",
  "gear-core",
@@ -416,7 +417,7 @@ dependencies = [
 [[package]]
 name = "gear-backend-wasmi"
 version = "0.1.0"
-source = "git+https://github.com/gear-tech/gear.git#dd1eb4a384327647fe61196e3aa6ceb2f7607adb"
+source = "git+https://github.com/gear-tech/gear.git#d7d4727a3a042925e7f53f4cfa8e37b66e5d717a"
 dependencies = [
  "derive_more",
  "gear-backend-common",
@@ -431,7 +432,7 @@ dependencies = [
 [[package]]
 name = "gear-core"
 version = "0.1.0"
-source = "git+https://github.com/gear-tech/gear.git#dd1eb4a384327647fe61196e3aa6ceb2f7607adb"
+source = "git+https://github.com/gear-tech/gear.git#d7d4727a3a042925e7f53f4cfa8e37b66e5d717a"
 dependencies = [
  "blake2-rfc",
  "derive_more",
@@ -448,7 +449,7 @@ dependencies = [
 [[package]]
 name = "gear-core-errors"
 version = "0.1.0"
-source = "git+https://github.com/gear-tech/gear.git#dd1eb4a384327647fe61196e3aa6ceb2f7607adb"
+source = "git+https://github.com/gear-tech/gear.git#d7d4727a3a042925e7f53f4cfa8e37b66e5d717a"
 dependencies = [
  "derive_more",
  "parity-scale-codec",
@@ -458,7 +459,7 @@ dependencies = [
 [[package]]
 name = "gear-core-processor"
 version = "0.1.0"
-source = "git+https://github.com/gear-tech/gear.git#dd1eb4a384327647fe61196e3aa6ceb2f7607adb"
+source = "git+https://github.com/gear-tech/gear.git#d7d4727a3a042925e7f53f4cfa8e37b66e5d717a"
 dependencies = [
  "anyhow",
  "blake2-rfc",
@@ -474,7 +475,7 @@ dependencies = [
 [[package]]
 name = "gear-wasm-builder"
 version = "0.1.2"
-source = "git+https://github.com/gear-tech/gear.git#dd1eb4a384327647fe61196e3aa6ceb2f7607adb"
+source = "git+https://github.com/gear-tech/gear.git#d7d4727a3a042925e7f53f4cfa8e37b66e5d717a"
 dependencies = [
  "anyhow",
  "cargo_metadata",
@@ -490,7 +491,7 @@ dependencies = [
 [[package]]
 name = "gear-wasm-instrument"
 version = "0.1.0"
-source = "git+https://github.com/gear-tech/gear.git#dd1eb4a384327647fe61196e3aa6ceb2f7607adb"
+source = "git+https://github.com/gear-tech/gear.git#d7d4727a3a042925e7f53f4cfa8e37b66e5d717a"
 dependencies = [
  "wasm-instrument",
 ]
@@ -508,7 +509,7 @@ dependencies = [
 [[package]]
 name = "gstd"
 version = "0.1.0"
-source = "git+https://github.com/gear-tech/gear.git#dd1eb4a384327647fe61196e3aa6ceb2f7607adb"
+source = "git+https://github.com/gear-tech/gear.git#d7d4727a3a042925e7f53f4cfa8e37b66e5d717a"
 dependencies = [
  "bs58",
  "futures",
@@ -526,7 +527,7 @@ dependencies = [
 [[package]]
 name = "gstd-codegen"
 version = "0.1.0"
-source = "git+https://github.com/gear-tech/gear.git#dd1eb4a384327647fe61196e3aa6ceb2f7607adb"
+source = "git+https://github.com/gear-tech/gear.git#d7d4727a3a042925e7f53f4cfa8e37b66e5d717a"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -536,7 +537,7 @@ dependencies = [
 [[package]]
 name = "gtest"
 version = "0.1.0"
-source = "git+https://github.com/gear-tech/gear.git#dd1eb4a384327647fe61196e3aa6ceb2f7607adb"
+source = "git+https://github.com/gear-tech/gear.git#d7d4727a3a042925e7f53f4cfa8e37b66e5d717a"
 dependencies = [
  "anyhow",
  "colored",
@@ -622,9 +623,9 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "libc"
-version = "0.2.135"
+version = "0.2.136"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "68783febc7782c6c5cb401fbda4de5a9898be1762314da0bb2c10ced61f18b0c"
+checksum = "55edcf6c0bb319052dea84732cf99db461780fd5e8d3eb46ab6ff312ab31f197"
 
 [[package]]
 name = "libc_print"
