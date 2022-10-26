@@ -19,8 +19,6 @@
 
 Advanced version of fungible token that supports sharding.
 
-> https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template
-
 <!-- End of description -->
 
 ## Prebuilt Binaries
