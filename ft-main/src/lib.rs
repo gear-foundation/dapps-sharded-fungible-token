@@ -1,7 +1,7 @@
 #![no_std]
 use ft_logic_io::*;
 use ft_main_io::*;
-use gstd::{exec, msg, prelude::*, prog::ProgramGenerator, ActorId};
+use gstd::{debug, exec, msg, prelude::*, prog::ProgramGenerator, ActorId};
 use primitive_types::H256;
 
 const DELAY: u32 = 600_000;
@@ -27,6 +27,8 @@ impl FToken {
         let transaction_hash = get_hash(&msg::source(), transaction_id);
         let transaction = self.transactions.get(&transaction_hash);
 
+        debug!("BEFORE SENDING A MESSAGE TO THE LOGIC CONTRACT");
+        debug!("BEFORE SENDING A MESSAGE TO THE LOGIC CONTRACT");
         match transaction {
             None => {
                 // If transaction took place for the first time we set its status to `InProgress`
@@ -51,6 +53,7 @@ impl FToken {
                 }
             },
         }
+        debug!("AFTER SENDING A MESSAGE TO THE LOGIC CONTRACT");
     }
 
     async fn send_message_then_reply(&mut self, transaction_hash: H256, payload: &[u8]) {
@@ -150,6 +153,18 @@ async fn main() {
 
 #[no_mangle]
 unsafe extern "C" fn init() {
+    debug!("INIT");
+    debug!("INIT");
+    debug!("INIT");
+    debug!("INIT");
+    debug!("INIT");
+    debug!("INIT");
+    debug!("INIT");
+    debug!("INIT");
+    debug!("INIT");
+    debug!("INIT");
+    debug!("INIT");
+
     let init_config: InitFToken = msg::load().expect("Unable to decode `InitFToken`");
     let (_message_id, ft_logic_id) = ProgramGenerator::create_program(
         init_config.ft_logic_code_hash.into(),

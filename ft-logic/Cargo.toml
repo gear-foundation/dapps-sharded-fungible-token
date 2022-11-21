@@ -4,7 +4,7 @@ version = "0.1.3"
 edition = "2021"
 
 [dependencies]
-gstd = { git = "https://github.com/gear-tech/gear.git", branch = "stable" }
+gstd = { git = "https://github.com/gear-tech/gear.git", features = ["debug"], branch = "stable" }
 ft-logic-io = { path = "io" }
 ft-storage-io = { path = "../ft-storage/io" }
 primitive-types = { version = "0.12.1", default-features = false, features = ["scale-info"]}
