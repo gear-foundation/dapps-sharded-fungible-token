@@ -1,7 +1,7 @@
 #![no_std]
 use ft_logic_io::*;
 use ft_main_io::*;
-use gstd::{exec, msg, prelude::*, prog::ProgramGenerator, ActorId};
+use gstd::{exec, debug, msg, prelude::*, prog::ProgramGenerator, ActorId};
 use primitive_types::H256;
 
 const DELAY: u32 = 600_000;
@@ -133,6 +133,7 @@ impl FToken {
 async fn main() {
     let action: FTokenAction = msg::load().expect("Unable to decode `FTokenAction");
     let ftoken: &mut FToken = unsafe { FTOKEN.get_or_insert(Default::default()) };
+    exec::system_reserve_gas(1_000_000_000).unwrap();
     match action {
         FTokenAction::Message {
             transaction_id,
@@ -147,6 +148,7 @@ async fn main() {
         _ => {}
     };
 }
+
 
 #[no_mangle]
 unsafe extern "C" fn init() {

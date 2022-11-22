@@ -4,7 +4,8 @@ version = "0.1.1"
 edition = "2021"
 
 [dependencies]
-gstd = { git = "https://github.com/gear-tech/gear.git" }
+gstd = { git = "https://github.com/gear-tech/gear.git", branch = "stable", features = ["debug"] }
+gear-core = { git = "https://github.com/gear-tech/gear.git", branch = "stable" }
 ft-logic-io = { path = "../ft-logic/io" }
 ft-main-io = { path = "io" }
 primitive-types = { version = "0.12.0", default-features = false }
@@ -16,3 +17,4 @@ gear-wasm-builder = { git = "https://github.com/gear-tech/gear.git", branch = "s
 [dev-dependencies]
 gtest = { git = "https://github.com/gear-tech/gear.git" , branch = "stable"}
 gclient = { git = "https://github.com/gear-tech/gear.git" , branch = "stable"}
+tokio = { version = "1.21.2", features = ["full"] }
