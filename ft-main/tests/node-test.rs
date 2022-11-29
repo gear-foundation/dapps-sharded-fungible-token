@@ -25,42 +25,44 @@ use gstd::CodeId;
 use gstd::{prelude::*, ActorId};
 use primitive_types::H256;
 use std::time::Duration;
+use blake2_rfc::blake2b;
+
+const HASH_LENGTH: usize = 32;
+type Hash = [u8; HASH_LENGTH];
 
 const PATHS: [&str; 3] = [
-    "../target/wasm32-unknown-unknown/release/ft_main.wasm",
+    "../target/wasm32-unknown-unknown/release/ft_main.opt.wasm",
     "../target/wasm32-unknown-unknown/release/ft_logic.opt.wasm",
     "../target/wasm32-unknown-unknown/release/ft_storage.opt.wasm",
 ];
 
-static mut STORAGE_ID: [u8; 32] = [0; 32];
-static mut LOGIC_ID: [u8; 32] = [0; 32];
 static mut TOKEN_ID: [u8; 32] = [0; 32];
 async fn upload_programs_and_check(api: &GearApi, listener: &mut EventListener) -> Result<()> {
     // upload codes for main fungible token contract
-    unsafe {
-        // Upload ft storage code
-        if let Ok((storage_id, _)) = api.upload_code(gclient::code_from_os(PATHS[0])?).await {
-            STORAGE_ID = storage_id.into();
-            println!("STORAGE ID {:?}", STORAGE_ID);
-        }
-        // Upload ft logic code
-        if let Ok((logic_id, _)) = api.upload_code(gclient::code_from_os(PATHS[1])?).await {
-            LOGIC_ID = logic_id.into();
-            println!("STORAGE ID {:?}", LOGIC_ID);
-        }
-    }
+    let mut storage_code_id: Hash = Default::default();
+    let storage_code = gclient::code_from_os(PATHS[2])?;
+    storage_code_id[..].copy_from_slice(blake2b::blake2b(HASH_LENGTH, &[], &storage_code).as_bytes());
+    api.upload_code(storage_code).await;
+
+    let mut logic_code_id: Hash = Default::default();
+    let logic_code = gclient::code_from_os(PATHS[1])?;
+    logic_code_id[..].copy_from_slice(blake2b::blake2b(HASH_LENGTH, &[], &logic_code).as_bytes());
+    api.upload_code(logic_code).await;
+   
 
     let init_ft_payload = unsafe {
         InitFToken {
-            storage_code_hash: STORAGE_ID.into(),
-            ft_logic_code_hash: LOGIC_ID.into(),
+            storage_code_hash: storage_code_id.into(),
+            ft_logic_code_hash: logic_code_id.into(),
         }
         .encode()
     };
+
+    println!("payload {:?}", init_ft_payload);
     let gas_info = api
         .calculate_upload_gas(
             None,
-            gclient::code_from_os(PATHS[2])?,
+            gclient::code_from_os(PATHS[0])?,
             init_ft_payload.clone(),
             0,
             true,
@@ -68,10 +70,10 @@ async fn upload_programs_and_check(api: &GearApi, listener: &mut EventListener) 
         )
         .await?;
 
-    // Program initialization.
+        // Program initialization.
     let (mid, _pid, _) = api
         .upload_program_bytes_by_path(
-            PATHS[2],
+            PATHS[0],
             gclient::bytes_now(),
             init_ft_payload,
             gas_info.min_limit,
@@ -92,7 +94,7 @@ async fn upload_programs_and_check(api: &GearApi, listener: &mut EventListener) 
 }
 
 #[tokio::test]
-async fn upload_codes() -> Result<()> {
+async fn mint_message() -> Result<()> {
     // Creating gear api.
     //
     // By default, login as Alice, than re-login as Bob.
@@ -120,7 +122,7 @@ async fn upload_codes() -> Result<()> {
     };
 
     let (mid, _) = unsafe {
-        api.send_message(TOKEN_ID.into(), mint_payload, gas_info.min_limit * 10  / 11, 0)
+        api.send_message(TOKEN_ID.into(), mint_payload, gas_info.min_limit, 0)
             .await?
     };
 
@@ -133,26 +135,3 @@ async fn upload_codes() -> Result<()> {
     Ok(())
 }
 
-// #[tokio::test]
-// async fn alloc_zero_pages() -> Result<()> {
-//     let _ = env_logger::Builder::from_default_env()
-//         .format_module_path(false)
-//         .format_level(true)
-//         .try_init();
-//     log::info!("Begin");
-//     let wat_code = r#"
-//         (module
-//             (import "env" "memory" (memory 0))
-//             (import "env" "alloc" (func $alloc (param i32) (result i32)))
-//             (export "init" (func $init))
-//             (func $init
-//                 i32.const 0
-//                 call $alloc
-//                 drop
-//             )
-//         )"#;
-//     let api = GearApi::dev().await?.with("//Bob")?;
-//     let codes = vec![wat::parse_str(wat_code).unwrap()];
-//     let res = upload_programs_and_check(&api, codes, Some(Duration::from_secs(5))).await;
-//     res
-// }

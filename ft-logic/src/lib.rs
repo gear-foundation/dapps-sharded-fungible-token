@@ -1,6 +1,6 @@
 #![no_std]
 use ft_logic_io::*;
-use gstd::{exec, msg, prelude::*, prog::ProgramGenerator, ActorId};
+use gstd::{exec, msg, debug, prelude::*, prog::ProgramGenerator, ActorId};
 mod instruction;
 use instruction::*;
 mod messages;
@@ -316,9 +316,12 @@ impl FTLogic {
     }
 }
 
-#[gstd::async_main]
-async fn main() {
-    let action: FTLogicAction = msg::load().expect("Error in loading `StorageAction`");
+
+fn __main_safe() {
+    gstd::message_loop(async { debug!("HANDLE_LOGIC");
+    let action: FTLogicAction = msg::load().expect("Error in loading `LogicAction`");
+    debug!("HANDLE_ACTION {:?}", action);
+
     let logic: &mut FTLogic = unsafe { FT_LOGIC.get_or_insert(Default::default()) };
     match action {
         FTLogicAction::Message {
@@ -333,8 +336,21 @@ async fn main() {
         FTLogicAction::GetBalance(account) => logic.get_balance(&account).await,
         _ => {}
     }
+    debug!("AFTER HANDLE ACTION");
+});
 }
 
+#[no_mangle]
+unsafe extern "C" fn handle_reply() { gstd::record_reply(); }
+#[no_mangle]
+unsafe extern "C" fn handle() { __main_safe(); }
+#[no_mangle]
+unsafe extern "C" fn handle_signal() {
+    debug!("HANDLE_SIGNAL");
+    debug!("HANDLE_SIGNAL");
+    debug!("HANDLE_SIGNAL");
+    debug!("HANDLE_SIGNAL");
+}
 #[no_mangle]
 unsafe extern "C" fn init() {
     let init_config: InitFTLogic = msg::load().expect("Unable to decode `InitFTLogic`");

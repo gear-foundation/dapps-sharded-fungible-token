@@ -1,6 +1,6 @@
 #![no_std]
 use ft_storage_io::*;
-use gstd::{exec, msg, prelude::*, ActorId};
+use gstd::{exec, msg, prelude::*, ActorId, debug};
 use primitive_types::H256;
 
 const DELAY: u32 = 600_000;
@@ -183,8 +183,11 @@ impl FTStorage {
 
 #[no_mangle]
 unsafe extern "C" fn handle() {
+    debug!("HANDLE STORAGE");
+    
     let action: FTStorageAction = msg::load().expect("Error in loading `StorageAction`");
     let storage: &mut FTStorage = FT_STORAGE.get_or_insert(Default::default());
+    debug!("STORAGE ACTION {:?}", action);
     match action {
         FTStorageAction::GetBalance(account) => storage.get_balance(&account),
         FTStorageAction::IncreaseBalance {
@@ -213,6 +216,7 @@ unsafe extern "C" fn handle() {
         } => storage.transfer(transaction_hash, &msg_source, &sender, &recipient, amount),
         FTStorageAction::Clear(transaction_hash) => storage.clear(transaction_hash),
     }
+    debug!("AFTER STORAGE ACTION");
 }
 
 #[no_mangle]
