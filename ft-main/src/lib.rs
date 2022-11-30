@@ -1,7 +1,8 @@
 #![no_std]
 use ft_logic_io::*;
 use ft_main_io::*;
-use gstd::{exec, debug, msg, prelude::*, prog::ProgramGenerator, ActorId};
+use gstd::{debug, exec, msg, prelude::*, prog::ProgramGenerator, ActorId};
+use hashbrown::HashMap;
 use primitive_types::H256;
 
 const DELAY: u32 = 600_000;
@@ -10,7 +11,7 @@ const DELAY: u32 = 600_000;
 struct FToken {
     admin: ActorId,
     ft_logic_id: ActorId,
-    transactions: BTreeMap<H256, TransactionStatus>,
+    transactions: HashMap<H256, TransactionStatus>,
 }
 
 static mut FTOKEN: Option<FToken> = None;
@@ -33,7 +34,7 @@ impl FToken {
             None => {
                 // If transaction took place for the first time we set its status to `InProgress`
                 // and send message to the logic contract.
-                send_delayed_clear(transaction_hash);
+                //     send_delayed_clear(transaction_hash);
                 self.transactions
                     .insert(transaction_hash, TransactionStatus::InProgress);
                 self.send_message_then_reply(transaction_hash, payload)
@@ -132,26 +133,46 @@ impl FToken {
     }
 }
 
-#[gstd::async_main]
-async fn main() {
-
-    let action: FTokenAction = msg::load().expect("Unable to decode `FTokenAction");
-    let ftoken: &mut FToken = unsafe { FTOKEN.get_or_insert(Default::default()) };
-    match action {
-        FTokenAction::Message {
-            transaction_id,
-            payload,
-        } => ftoken.message(transaction_id, &payload).await,
-        FTokenAction::UpdateLogicContract {
-            ft_logic_code_hash,
-            storage_code_hash,
-        } => ftoken.update_logic_contract(ft_logic_code_hash, storage_code_hash),
-        FTokenAction::Clear(transaction_hash) => ftoken.clear(transaction_hash),
-        FTokenAction::GetBalance(account) => ftoken.get_balance(&account).await,
-        _ => {}
-    };
+fn __main_safe() {
+    gstd::message_loop(async {
+        let action: FTokenAction = msg::load().expect("Unable to decode `FTokenAction");
+        let ftoken: &mut FToken = unsafe { FTOKEN.get_or_insert(Default::default()) };
+        match action {
+            FTokenAction::Message {
+                transaction_id,
+                payload,
+            } => ftoken.message(transaction_id, &payload).await,
+            FTokenAction::UpdateLogicContract {
+                ft_logic_code_hash,
+                storage_code_hash,
+            } => ftoken.update_logic_contract(ft_logic_code_hash, storage_code_hash),
+            FTokenAction::Clear(transaction_hash) => ftoken.clear(transaction_hash),
+            FTokenAction::GetBalance(account) => ftoken.get_balance(&account).await,
+            _ => {}
+        };
+    });
 }
 
+#[no_mangle]
+unsafe extern "C" fn handle_reply() {
+    gstd::record_reply();
+}
+
+#[no_mangle]
+unsafe extern "C" fn handle_signal() {
+    debug!("HANDLE SIGNAL MAIN");
+    debug!("HANDLE SIGNAL MAIN");
+    debug!("HANDLE SIGNAL MAIN");
+    debug!("HANDLE SIGNAL MAIN");
+    debug!("HANDLE SIGNAL MAIN");
+    debug!("HANDLE SIGNAL MAIN");
+    gstd::record_reply();
+}
+
+#[no_mangle]
+unsafe extern "C" fn handle() {
+    __main_safe();
+}
 
 #[no_mangle]
 unsafe extern "C" fn init() {

@@ -11,6 +11,8 @@ ft-main-io = { path = "io" }
 primitive-types = { version = "0.12.0", default-features = false }
 sp-core-hashing = { version = "4.0.0", default-features = false }
 blake2-rfc = { version = "0.2.18", default-features = false }
+hex-literal = "0.3.4"
+hashbrown = "0.12.3"
 
 [build-dependencies]
 gear-wasm-builder = { git = "https://github.com/gear-tech/gear.git", branch = "stable" }

@@ -1,9 +1,10 @@
 #![no_std]
 use ft_logic_io::*;
-use gstd::{exec, msg, debug, prelude::*, prog::ProgramGenerator, ActorId};
+use gstd::{debug, exec, msg, prelude::*, prog::ProgramGenerator, ActorId};
 mod instruction;
 use instruction::*;
 mod messages;
+use hashbrown::HashMap;
 use messages::*;
 use primitive_types::H256;
 
@@ -14,10 +15,10 @@ const DELAY: u32 = 600_000;
 struct FTLogic {
     admin: ActorId,
     ftoken_id: ActorId,
-    transaction_status: BTreeMap<H256, TransactionStatus>,
-    instructions: BTreeMap<H256, (Instruction, Instruction)>,
+    transaction_status: HashMap<H256, TransactionStatus>,
+    instructions: HashMap<H256, (Instruction, Instruction)>,
     storage_code_hash: H256,
-    id_to_storage: BTreeMap<String, ActorId>,
+    id_to_storage: HashMap<String, ActorId>,
 }
 
 static mut FT_LOGIC: Option<FTLogic> = None;
@@ -50,7 +51,7 @@ impl FTLogic {
             // The transaction took place for the first time
             // Or there was not enough gas to change the `TransactionStatus`.
             TransactionStatus::InProgress => {
-                send_delayed_clear(transaction_hash);
+                //    send_delayed_clear(transaction_hash);
                 self.transaction_status
                     .insert(transaction_hash, TransactionStatus::InProgress);
                 match action {
@@ -316,40 +317,45 @@ impl FTLogic {
     }
 }
 
-
 fn __main_safe() {
-    gstd::message_loop(async { debug!("HANDLE_LOGIC");
-    let action: FTLogicAction = msg::load().expect("Error in loading `LogicAction`");
-    debug!("HANDLE_ACTION {:?}", action);
+    gstd::message_loop(async {
+        debug!("MESSAGE GAS RESERVATION {:?}", msg::id());
+        //  exec::system_reserve_gas(100_000_000).unwrap();
 
-    let logic: &mut FTLogic = unsafe { FT_LOGIC.get_or_insert(Default::default()) };
-    match action {
-        FTLogicAction::Message {
-            transaction_hash,
-            account,
-            payload,
-        } => logic.message(transaction_hash, &account, &payload).await,
-        FTLogicAction::UpdateStorageCodeHash(storage_code_hash) => {
-            logic.update_storage_hash(storage_code_hash)
+        let action: FTLogicAction = msg::load().expect("Error in loading `LogicAction`");
+        debug!("HANDLE_ACTION {:?}", action);
+        let logic: &mut FTLogic = unsafe { FT_LOGIC.get_or_insert(Default::default()) };
+        match action {
+            FTLogicAction::Message {
+                transaction_hash,
+                account,
+                payload,
+            } => logic.message(transaction_hash, &account, &payload).await,
+            FTLogicAction::UpdateStorageCodeHash(storage_code_hash) => {
+                logic.update_storage_hash(storage_code_hash)
+            }
+            FTLogicAction::Clear(transaction_hash) => logic.clear(transaction_hash),
+            FTLogicAction::GetBalance(account) => logic.get_balance(&account).await,
+            _ => {}
         }
-        FTLogicAction::Clear(transaction_hash) => logic.clear(transaction_hash),
-        FTLogicAction::GetBalance(account) => logic.get_balance(&account).await,
-        _ => {}
-    }
-    debug!("AFTER HANDLE ACTION");
-});
+        debug!("AFTER HANDLE ACTION");
+    });
 }
 
 #[no_mangle]
-unsafe extern "C" fn handle_reply() { gstd::record_reply(); }
+unsafe extern "C" fn handle_reply() {
+    gstd::record_reply();
+}
 #[no_mangle]
-unsafe extern "C" fn handle() { __main_safe(); }
+unsafe extern "C" fn handle() {
+    __main_safe();
+}
 #[no_mangle]
 unsafe extern "C" fn handle_signal() {
-    debug!("HANDLE_SIGNAL");
-    debug!("HANDLE_SIGNAL");
-    debug!("HANDLE_SIGNAL");
-    debug!("HANDLE_SIGNAL");
+    debug!("HANDLE_SIGNAL LOGIC {:?}", msg::id());
+    debug!("HANDLE_SIGNAL LOGIC {:?}", msg::status_code());
+    debug!("HANDLE_SIGNAL LOGIC");
+    debug!("HANDLE_SIGNAL LOGIC");
 }
 #[no_mangle]
 unsafe extern "C" fn init() {
@@ -387,7 +393,14 @@ unsafe extern "C" fn meta_state() -> *mut [i32; 2] {
     let logic: &mut FTLogic = FT_LOGIC.get_or_insert(Default::default());
 
     let encoded = match query {
-        FTLogicState::Storages => FTLogicStateReply::Storages(logic.id_to_storage.clone()),
+        FTLogicState::Storages => {
+            let storages = logic.id_to_storage.clone();
+            let vec_storages = storages
+                .into_iter()
+                .map(|id_to_storage| id_to_storage)
+                .collect();
+            FTLogicStateReply::Storages(vec_storages)
+        }
     }
     .encode();
     gstd::util::to_leak_ptr(encoded)

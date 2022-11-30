@@ -1,16 +1,16 @@
 #![no_std]
 use ft_storage_io::*;
-use gstd::{exec, msg, prelude::*, ActorId, debug};
+use gstd::{debug, exec, msg, prelude::*, ActorId};
+use hashbrown::HashMap;
 use primitive_types::H256;
-
 const DELAY: u32 = 600_000;
 
 #[derive(Default)]
 struct FTStorage {
     ft_logic_id: ActorId,
-    transaction_status: BTreeMap<H256, bool>,
-    balances: BTreeMap<ActorId, u128>,
-    approvals: BTreeMap<ActorId, BTreeMap<ActorId, u128>>,
+    transaction_status: HashMap<H256, bool>,
+    balances: HashMap<ActorId, u128>,
+    approvals: HashMap<ActorId, HashMap<ActorId, u128>>,
 }
 
 static mut FT_STORAGE: Option<FTStorage> = None;
@@ -61,7 +61,7 @@ impl FTStorage {
             return;
         }
 
-        send_delayed_clear(transaction_hash);
+        // send_delayed_clear(transaction_hash);
 
         match self.decrease(msg_source, sender, amount) {
             true => {
@@ -92,7 +92,7 @@ impl FTStorage {
             return;
         }
 
-        send_delayed_clear(transaction_hash);
+        // send_delayed_clear(transaction_hash);
 
         // increase balance
         self.balances
@@ -121,7 +121,7 @@ impl FTStorage {
             return;
         }
 
-        send_delayed_clear(transaction_hash);
+        // send_delayed_clear(transaction_hash);
         // decrease balance
         match self.decrease(msg_source, account, amount) {
             true => {
@@ -152,7 +152,7 @@ impl FTStorage {
             };
             return;
         }
-        send_delayed_clear(transaction_hash);
+        // send_delayed_clear(transaction_hash);
 
         self.approvals
             .entry(*msg_source)
@@ -183,8 +183,8 @@ impl FTStorage {
 
 #[no_mangle]
 unsafe extern "C" fn handle() {
-    debug!("HANDLE STORAGE");
-    
+    debug!("HANDLE STORAGE {:?}", msg::id());
+
     let action: FTStorageAction = msg::load().expect("Error in loading `StorageAction`");
     let storage: &mut FTStorage = FT_STORAGE.get_or_insert(Default::default());
     debug!("STORAGE ACTION {:?}", action);
@@ -237,6 +237,10 @@ unsafe extern "C" fn meta_state() -> *mut [i32; 2] {
         FTStorageState::Balance(account) => {
             let balance = storage.balances.get(&account).unwrap_or(&0);
             FTStorageStateReply::Balance(*balance)
+        }, 
+        FTStorageState::Accounts => {
+            let accounts = storage.balances.keys().cloned().collect();
+            FTStorageStateReply::Accounts(accounts)
         }
     }
     .encode();

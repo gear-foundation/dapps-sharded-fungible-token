@@ -42,9 +42,11 @@ pub enum FTStorageEvent {
 #[derive(Encode, Decode, TypeInfo)]
 pub enum FTStorageState {
     Balance(ActorId),
+    Accounts,
 }
 
 #[derive(Encode, Decode, Debug, TypeInfo)]
 pub enum FTStorageStateReply {
     Balance(u128),
+    Accounts(Vec<ActorId>),
 }

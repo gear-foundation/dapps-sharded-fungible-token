@@ -2,7 +2,7 @@
 use gstd::{prelude::*, ActorId};
 use primitive_types::H256;
 
-#[derive(Encode, Decode, TypeInfo, Debug)]
+#[derive(Encode, Decode, TypeInfo, Debug, Clone)]
 pub enum FTokenAction {
     Message {
         transaction_id: u64,
