@@ -18,6 +18,7 @@
 
 //! Test for harmful demos, checking their init can't brake the chain.
 
+use blake2_rfc::blake2b;
 use ft_logic_io::Action;
 use ft_main_io::*;
 use gclient::{EventListener, EventProcessor, GearApi, Result};
@@ -25,7 +26,6 @@ use gstd::CodeId;
 use gstd::{prelude::*, ActorId};
 use primitive_types::H256;
 use std::time::Duration;
-use blake2_rfc::blake2b;
 
 const HASH_LENGTH: usize = 32;
 type Hash = [u8; HASH_LENGTH];
@@ -41,14 +41,14 @@ async fn upload_programs_and_check(api: &GearApi, listener: &mut EventListener) 
     // upload codes for main fungible token contract
     let mut storage_code_id: Hash = Default::default();
     let storage_code = gclient::code_from_os(PATHS[2])?;
-    storage_code_id[..].copy_from_slice(blake2b::blake2b(HASH_LENGTH, &[], &storage_code).as_bytes());
+    storage_code_id[..]
+        .copy_from_slice(blake2b::blake2b(HASH_LENGTH, &[], &storage_code).as_bytes());
     api.upload_code(storage_code).await;
 
     let mut logic_code_id: Hash = Default::default();
     let logic_code = gclient::code_from_os(PATHS[1])?;
     logic_code_id[..].copy_from_slice(blake2b::blake2b(HASH_LENGTH, &[], &logic_code).as_bytes());
     api.upload_code(logic_code).await;
-   
 
     let init_ft_payload = unsafe {
         InitFToken {
@@ -70,7 +70,7 @@ async fn upload_programs_and_check(api: &GearApi, listener: &mut EventListener) 
         )
         .await?;
 
-        // Program initialization.
+    // Program initialization.
     let (mid, _pid, _) = api
         .upload_program_bytes_by_path(
             PATHS[0],
@@ -135,3 +135,56 @@ async fn mint_message() -> Result<()> {
     Ok(())
 }
 
+const TEST_THRESHOLD: usize = 100;
+
+#[tokio::test]
+async fn multi_mint_message() -> Result<()> {
+    // Creating gear api.
+    //
+    // By default, login as Alice, than re-login as Bob.
+    println!("Signing in!");
+    let api = GearApi::dev().await?.with("//Bob")?;
+    println!("Subscribing!");
+    let mut listener = api.subscribe().await?;
+
+    println!("Uploading program!");
+    upload_programs_and_check(&api, &mut listener).await?;
+
+    let amount: u128 = 10_000;
+    let mut mids = Vec::new();
+
+    for transaction_id in 1..TEST_THRESHOLD as u64 {
+        println!("Transaction number: {transaction_id}");
+
+        let mint_payload = FTokenAction::Message {
+            transaction_id,
+            payload: Action::Mint {
+                recipient: transaction_id.into(),
+                amount,
+            }
+            .encode(),
+        };
+
+        let gas_info = unsafe {
+            api.calculate_handle_gas(None, TOKEN_ID.into(), mint_payload.encode(), 0, true, None)
+                .await?
+        };
+
+        let (mid, _) = unsafe {
+            api.send_message(TOKEN_ID.into(), mint_payload, gas_info.min_limit * 2, 0)
+                .await?
+        };
+        mids.push(mid);
+    }
+
+    for (i, iter) in mids.iter().enumerate() {
+        println!("Checking transasction number {}", i + 1);
+        // Asserting successful initialization.
+        assert!(listener.message_processed(*iter).await?.succeed());
+
+        // Checking that blocks still running.
+        assert!(listener.blocks_running().await?);
+    }
+
+    Ok(())
+}
