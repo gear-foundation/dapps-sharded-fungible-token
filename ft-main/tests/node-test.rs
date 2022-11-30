@@ -22,6 +22,7 @@ use blake2_rfc::blake2b;
 use ft_logic_io::Action;
 use ft_main_io::*;
 use gclient::{EventListener, EventProcessor, GearApi, Result};
+use gear_core::ids::ProgramId;
 use gstd::CodeId;
 use gstd::{prelude::*, ActorId};
 use primitive_types::H256;
@@ -37,6 +38,7 @@ const PATHS: [&str; 3] = [
 ];
 
 static mut TOKEN_ID: [u8; 32] = [0; 32];
+
 async fn upload_programs_and_check(api: &GearApi, listener: &mut EventListener) -> Result<()> {
     // upload codes for main fungible token contract
     let mut storage_code_id: Hash = Default::default();
@@ -93,6 +95,9 @@ async fn upload_programs_and_check(api: &GearApi, listener: &mut EventListener) 
     Ok(())
 }
 
+const TEST_THRESHOLD: usize = 100;
+const MAX_GAS_LIMIT: u64 = 250_000_000_000;
+
 #[tokio::test]
 async fn mint_message() -> Result<()> {
     // Creating gear api.
@@ -116,13 +121,8 @@ async fn mint_message() -> Result<()> {
         .encode(),
     };
 
-    let gas_info = unsafe {
-        api.calculate_handle_gas(None, TOKEN_ID.into(), mint_payload.encode(), 0, true, None)
-            .await?
-    };
-
     let (mid, _) = unsafe {
-        api.send_message(TOKEN_ID.into(), mint_payload, gas_info.min_limit, 0)
+        api.send_message(TOKEN_ID.into(), mint_payload, MAX_GAS_LIMIT, 0)
             .await?
     };
 
@@ -134,8 +134,6 @@ async fn mint_message() -> Result<()> {
 
     Ok(())
 }
-
-const TEST_THRESHOLD: usize = 100;
 
 #[tokio::test]
 async fn multi_mint_message() -> Result<()> {
@@ -151,11 +149,10 @@ async fn multi_mint_message() -> Result<()> {
     upload_programs_and_check(&api, &mut listener).await?;
 
     let amount: u128 = 10_000;
-    let mut mids = Vec::new();
+    let mut payloads: Vec<Vec<u8>> = Vec::new();
 
+    println!("Creating batch!");
     for transaction_id in 1..TEST_THRESHOLD as u64 {
-        println!("Transaction number: {transaction_id}");
-
         let mint_payload = FTokenAction::Message {
             transaction_id,
             payload: Action::Mint {
@@ -165,26 +162,37 @@ async fn multi_mint_message() -> Result<()> {
             .encode(),
         };
 
-        let gas_info = unsafe {
-            api.calculate_handle_gas(None, TOKEN_ID.into(), mint_payload.encode(), 0, true, None)
-                .await?
-        };
-
-        let (mid, _) = unsafe {
-            api.send_message(TOKEN_ID.into(), mint_payload, gas_info.min_limit * 2, 0)
-                .await?
-        };
-        mids.push(mid);
+        payloads.push(mint_payload.encode());
     }
 
-    for (i, iter) in mids.iter().enumerate() {
-        println!("Checking transasction number {}", i + 1);
-        // Asserting successful initialization.
-        assert!(listener.message_processed(*iter).await?.succeed());
+    let payloads_len = payloads.len();
+    let program_id: ProgramId = unsafe { TOKEN_ID.into() };
 
-        // Checking that blocks still running.
-        assert!(listener.blocks_running().await?);
-    }
+    // Sending batch.
+    let args: Vec<_> = payloads
+        .into_iter()
+        .map(|payload| (program_id, payload, MAX_GAS_LIMIT, 0))
+        .collect();
+
+    println!("Sending batch!");
+    let (ex_res, _) = api.send_message_bytes_batch(args).await?;
+
+    println!("Checking messages!");
+    // Ids of initial messages.
+    let mids: Vec<_> = ex_res
+        .into_iter()
+        .filter_map(|v| v.ok().map(|(mid, _pid)| mid))
+        .collect();
+
+    assert_eq!(payloads_len, mids.len());
+
+    // Checking that all batch got processed.
+    assert_eq!(
+        payloads_len,
+        listener.message_processed_batch(mids).await?.len(),
+    );
+    // Checking that blocks still running.
+    assert!(listener.blocks_running().await?);
 
     Ok(())
 }
