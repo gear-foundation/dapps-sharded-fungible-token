@@ -96,6 +96,7 @@ async fn upload_programs_and_check(api: &GearApi, listener: &mut EventListener) 
 }
 
 const TEST_THRESHOLD: usize = 100;
+const MESSAGE_PER_BATCH: usize = 40;
 const MAX_GAS_LIMIT: u64 = 250_000_000_000;
 
 #[tokio::test]
@@ -111,6 +112,7 @@ async fn mint_message() -> Result<()> {
     let account: u64 = 1;
     let transaction_id: u64 = 0;
     let amount: u128 = 10_000;
+    let program_id: ProgramId = unsafe { TOKEN_ID.into() };
 
     let mint_payload = FTokenAction::Message {
         transaction_id,
@@ -121,10 +123,9 @@ async fn mint_message() -> Result<()> {
         .encode(),
     };
 
-    let (mid, _) = unsafe {
-        api.send_message(TOKEN_ID.into(), mint_payload, MAX_GAS_LIMIT, 0)
-            .await?
-    };
+    let (mid, _) = api
+        .send_message(program_id, mint_payload, MAX_GAS_LIMIT, 0)
+        .await?;
 
     // Asserting successful initialization.
     assert!(listener.message_processed(mid).await?.succeed());
@@ -152,7 +153,7 @@ async fn multi_mint_message() -> Result<()> {
     let mut payloads: Vec<Vec<u8>> = Vec::new();
 
     println!("Creating batch!");
-    for transaction_id in 1..TEST_THRESHOLD as u64 {
+    for transaction_id in 1..MESSAGE_PER_BATCH as u64 {
         let mint_payload = FTokenAction::Message {
             transaction_id,
             payload: Action::Mint {
