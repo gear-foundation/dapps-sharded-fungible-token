@@ -95,7 +95,7 @@ async fn upload_programs_and_check(api: &GearApi, listener: &mut EventListener) 
     Ok(())
 }
 
-const TEST_THRESHOLD: usize = 100;
+const TEST_THRESHOLD: usize = 400;
 const MESSAGE_PER_BATCH: usize = 40;
 const MAX_GAS_LIMIT: u64 = 250_000_000_000;
 
@@ -137,7 +137,7 @@ async fn mint_message() -> Result<()> {
 }
 
 #[tokio::test]
-async fn multi_mint_message() -> Result<()> {
+async fn batch_mint_message() -> Result<()> {
     // Creating gear api.
     //
     // By default, login as Alice, than re-login as Bob.
@@ -194,6 +194,75 @@ async fn multi_mint_message() -> Result<()> {
     );
     // Checking that blocks still running.
     assert!(listener.blocks_running().await?);
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn multi_batch_mint_message() -> Result<()> {
+    // Creating gear api.
+    //
+    // By default, login as Alice, than re-login as Bob.
+    println!("Signing in");
+    let api = GearApi::dev().await?.with("//Bob")?;
+    println!("Subscribing");
+    let mut listener = api.subscribe().await?;
+
+    println!("Uploading program");
+    upload_programs_and_check(&api, &mut listener).await?;
+
+    let amount: u128 = 10_000;
+    let program_id: ProgramId = unsafe { TOKEN_ID.into() };
+
+    for batch_num in 1..(TEST_THRESHOLD / MESSAGE_PER_BATCH) {
+        println!("Creating batch num {}", batch_num);
+
+        let first_transaction_num = batch_num * MESSAGE_PER_BATCH + 1;
+        let last_transaction_num = first_transaction_num + MESSAGE_PER_BATCH;
+        let mut payloads: Vec<Vec<u8>> = Vec::new();
+
+        for iteration_num in first_transaction_num..last_transaction_num {
+            let transaction_id: u64 = iteration_num as u64;
+            let mint_payload = FTokenAction::Message {
+                transaction_id,
+                payload: Action::Mint {
+                    recipient: transaction_id.into(),
+                    amount,
+                }
+                .encode(),
+            };
+
+            payloads.push(mint_payload.encode());
+        }
+
+        let payloads_len = payloads.len();
+
+        // Sending batch.
+        let args: Vec<_> = payloads
+            .into_iter()
+            .map(|payload| (program_id, payload, MAX_GAS_LIMIT, 0))
+            .collect();
+
+        println!("Sending batch");
+        let (ex_res, _) = api.send_message_bytes_batch(args).await?;
+
+        println!("Checking messages");
+        // Ids of initial messages.
+        let mids: Vec<_> = ex_res
+            .into_iter()
+            .filter_map(|v| v.ok().map(|(mid, _pid)| mid))
+            .collect();
+
+        assert_eq!(payloads_len, mids.len());
+
+        // Checking that all batch got processed.
+        assert_eq!(
+            payloads_len,
+            listener.message_processed_batch(mids).await?.len(),
+        );
+        // Checking that blocks still running.
+        assert!(listener.blocks_running().await?);
+    }
 
     Ok(())
 }
