@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.3] - 2022-12-03
 ### Added
-- Derived the `PartialEq`, `Eq`, `PartialOrd`, and `Ord` traits for the `FTokenEvent` enum for use in transaction-based contracts.
+- Derived the `Clone`, `Copy`, `PartialEq`, `Eq`, `PartialOrd`, and `Ord` traits for the `FTokenEvent` enum for use in transaction-based contracts.
 
 ## [0.1.2] - 2022-11-22
 ### Changed
