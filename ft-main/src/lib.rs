@@ -153,18 +153,6 @@ async fn main() {
 
 #[no_mangle]
 unsafe extern "C" fn init() {
-    debug!("INIT");
-    debug!("INIT");
-    debug!("INIT");
-    debug!("INIT");
-    debug!("INIT");
-    debug!("INIT");
-    debug!("INIT");
-    debug!("INIT");
-    debug!("INIT");
-    debug!("INIT");
-    debug!("INIT");
-
     let init_config: InitFToken = msg::load().expect("Unable to decode `InitFToken`");
     let (_message_id, ft_logic_id) = ProgramGenerator::create_program(
         init_config.ft_logic_code_hash.into(),

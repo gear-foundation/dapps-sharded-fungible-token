@@ -349,13 +349,6 @@ unsafe extern "C" fn handle() {
     __main_safe();
 }
 #[no_mangle]
-unsafe extern "C" fn handle_signal() {
-    debug!("HANDLE_SIGNAL");
-    debug!("HANDLE_SIGNAL");
-    debug!("HANDLE_SIGNAL");
-    debug!("HANDLE_SIGNAL");
-}
-#[no_mangle]
 unsafe extern "C" fn init() {
     let init_config: InitFTLogic = msg::load().expect("Unable to decode `InitFTLogic`");
     let ft_logic = FTLogic {
