@@ -9,7 +9,7 @@ ft-logic-io = { path = "io" }
 ft-storage-io = { path = "../ft-storage/io" }
 primitive-types = { version = "0.12.1", default-features = false, features = ["scale-info"]}
 hex = { version = "0.4.3", default-features = false, features = ["alloc"] }
-light_sr25519 = { git = "https://github.com/gear-tech/gear.git", rev = "d23e90b6"}
+light_sr25519 = { git = "https://github.com/gear-tech/gear.git", branch = "stable" }
 hashbrown = "0.13.1"
 
 [dev-dependencies]

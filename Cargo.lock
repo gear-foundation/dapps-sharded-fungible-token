@@ -1242,7 +1242,7 @@ dependencies = [
 [[package]]
 name = "light_sr25519"
 version = "0.1.0"
-source = "git+https://github.com/gear-tech/gear.git?rev=d23e90b6#d23e90b65f5b973e5d0b00606be4ad9fd8b96ce0"
+source = "git+https://github.com/gear-tech/gear.git?branch=stable#ec8de75d6001cdd477ac2a7e0251fe24c947c232"
 dependencies = [
  "schnorrkel 0.10.2",
 ]

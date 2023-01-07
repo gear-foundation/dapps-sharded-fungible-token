@@ -7,25 +7,15 @@ use sp_core::sr25519::Signature;
 pub trait FToken {
     fn ftoken(system: &System) -> Program;
     fn mint(&self, transaction_id: u64, from: u64, account: u64, amount: u128, error: bool);
-    fn check_balance(&self, account: u64, expected_amount: u128);
-    fn check_balance_actor_id(&self, account: ActorId, expected_amount: u128);
-    fn check_permit_id(&self, account: ActorId, expected_permit_id: u128);
+    fn check_balance(&self, account: impl Into<ActorId>, expected_amount: u128);
+    fn check_permit_id(&self, account: [u8; 32], expected_permit_id: u128);
     fn burn(&self, transaction_id: u64, from: u64, account: u64, amount: u128, error: bool);
     fn transfer(
         &self,
         transaction_id: u64,
         from: u64,
-        sender: u64,
-        recipient: u64,
-        amount: u128,
-        error: bool,
-    );
-    fn transfer_actor_id(
-        &self,
-        transaction_id: u64,
-        from: u64,
-        sender: ActorId,
-        recipient: ActorId,
+        sender: impl Into<ActorId>,
+        recipient: impl Into<ActorId>,
         amount: u128,
         error: bool,
     );
@@ -113,39 +103,14 @@ impl FToken for Program<'_> {
         &self,
         transaction_id: u64,
         from: u64,
-        sender: u64,
-        recipient: u64,
+        sender: impl Into<ActorId>,
+        recipient: impl Into<ActorId>,
         amount: u128,
         error: bool,
     ) {
         let payload = Action::Transfer {
             sender: sender.into(),
             recipient: recipient.into(),
-            amount,
-        }
-        .encode();
-        self.send_message_and_check_res(
-            from,
-            FTokenAction::Message {
-                transaction_id,
-                payload,
-            },
-            error,
-        );
-    }
-
-    fn transfer_actor_id(
-        &self,
-        transaction_id: u64,
-        from: u64,
-        sender: ActorId,
-        recipient: ActorId,
-        amount: u128,
-        error: bool,
-    ) {
-        let payload = Action::Transfer {
-            sender,
-            recipient,
             amount,
         }
         .encode();
@@ -211,20 +176,14 @@ impl FToken for Program<'_> {
         );
     }
 
-    fn check_balance(&self, account: u64, expected_amount: u128) {
+    fn check_balance(&self, account: impl Into<ActorId>, expected_amount: u128) {
         let res = self.send(HARDCODED_ACCOUNT, FTokenAction::GetBalance(account.into()));
         let reply = FTLogicEvent::Balance(expected_amount).encode();
         assert!(res.contains(&(HARDCODED_ACCOUNT, reply)));
     }
 
-    fn check_balance_actor_id(&self, account: ActorId, expected_amount: u128) {
-        let res = self.send(HARDCODED_ACCOUNT, FTokenAction::GetBalance(account));
-        let reply = FTLogicEvent::Balance(expected_amount).encode();
-        assert!(res.contains(&(HARDCODED_ACCOUNT, reply)));
-    }
-
-    fn check_permit_id(&self, account: ActorId, expected_permit_id: u128) {
-        let res = self.send(HARDCODED_ACCOUNT, FTokenAction::GetPermitId(account));
+    fn check_permit_id(&self, account: [u8; 32], expected_permit_id: u128) {
+        let res = self.send(HARDCODED_ACCOUNT, FTokenAction::GetPermitId(account.into()));
         let reply = FTLogicEvent::PermitId(expected_permit_id).encode();
         assert!(res.contains(&(HARDCODED_ACCOUNT, reply)));
     }

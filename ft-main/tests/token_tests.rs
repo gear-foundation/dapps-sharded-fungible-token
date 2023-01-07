@@ -237,16 +237,16 @@ fn permit() {
     transaction_id += 1;
 
     // Sending tokens to owner_id and aprrove
-    ftoken.transfer_actor_id(
+    ftoken.transfer(
         transaction_id,
         sender,
-        sender.into(),
-        owner.into(),
+        sender,
+        owner,
         amount,
         false,
     );
     transaction_id += 1;
-    ftoken.check_balance_actor_id(owner.into(), amount);
+    ftoken.check_balance(owner, amount);
     ftoken.check_permit_id(owner.into(), permit_id);
 
     /*
@@ -265,11 +265,11 @@ fn permit() {
         false,
     );
     transaction_id += 1;
-    ftoken.transfer_actor_id(
+    ftoken.transfer(
         transaction_id,
         approved,
-        owner.into(),
-        sender.into(),
+        owner,
+        sender,
         amount / 2,
         false,
     );
@@ -279,7 +279,7 @@ fn permit() {
      * approved -> 0 tokens
      */
     ftoken.check_balance(sender, amount / 2);
-    ftoken.check_balance_actor_id(owner.into(), amount / 2);
+    ftoken.check_balance(owner, amount / 2);
     ftoken.check_permit_id(owner.into(), 1);
 
     // Failing cause of current permit_id is already executed

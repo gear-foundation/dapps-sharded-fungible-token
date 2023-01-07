@@ -18,6 +18,6 @@ gear-wasm-builder = { git = "https://github.com/gear-tech/gear.git", branch = "s
 gtest = { git = "https://github.com/gear-tech/gear.git", branch = "stable" }
 hex-literal = "0.3.4"
 sp-core = { version = "6.0.0", git = "https://github.com/gear-tech/substrate.git", branch = "gear-stable" }
-light_sr25519 = { git = "https://github.com/gear-tech/gear.git", rev = "d23e90b6" }
-ft-storage-io = {path = "../ft-storage/io" }
-ft-logic-io = {path = "../ft-logic/io" }
+light_sr25519 = { git = "https://github.com/gear-tech/gear.git", branch = "stable" }
+ft-storage-io = { path = "../ft-storage/io" }
+ft-logic-io = { path = "../ft-logic/io" }
