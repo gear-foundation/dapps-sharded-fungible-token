@@ -216,7 +216,7 @@ fn permit() {
         assert!(light_sr25519::verify(signature.encode().as_slice(), message_bytes, owner).is_ok());
     }
 
-    ftoken.check_permit_id(owner.into(), 0);
+    ftoken.check_permit_id(owner, 0);
 
     /*
      * sender   -> 100k tokens
@@ -237,17 +237,10 @@ fn permit() {
     transaction_id += 1;
 
     // Sending tokens to owner_id and aprrove
-    ftoken.transfer(
-        transaction_id,
-        sender,
-        sender,
-        owner,
-        amount,
-        false,
-    );
+    ftoken.transfer(transaction_id, sender, sender, owner, amount, false);
     transaction_id += 1;
     ftoken.check_balance(owner, amount);
-    ftoken.check_permit_id(owner.into(), permit_id);
+    ftoken.check_permit_id(owner, permit_id);
 
     /*
      * sender   -> 0 tokens
@@ -265,14 +258,7 @@ fn permit() {
         false,
     );
     transaction_id += 1;
-    ftoken.transfer(
-        transaction_id,
-        approved,
-        owner,
-        sender,
-        amount / 2,
-        false,
-    );
+    ftoken.transfer(transaction_id, approved, owner, sender, amount / 2, false);
     /*
      * sender   -> 50k tokens
      * owner    -> 50k tokens, permit_id 1
@@ -280,7 +266,7 @@ fn permit() {
      */
     ftoken.check_balance(sender, amount / 2);
     ftoken.check_balance(owner, amount / 2);
-    ftoken.check_permit_id(owner.into(), 1);
+    ftoken.check_permit_id(owner, 1);
 
     // Failing cause of current permit_id is already executed
     ftoken.permit(
@@ -313,7 +299,7 @@ fn permit() {
      * owner    -> 50k tokens, permit_id 1
      * approved -> 0 tokens
      */
-    ftoken.check_permit_id(owner.into(), 1);
+    ftoken.check_permit_id(owner, 1);
 
     let new_signature;
     {
@@ -342,5 +328,5 @@ fn permit() {
         new_signature,
         false,
     );
-    ftoken.check_permit_id(owner.into(), 2);
+    ftoken.check_permit_id(owner, 2);
 }
