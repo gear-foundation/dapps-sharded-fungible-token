@@ -1,6 +1,7 @@
 #![no_std]
 use gstd::{prelude::*, ActorId};
 use primitive_types::H256;
+use gmeta::{InOut, Metadata};
 
 #[derive(Encode, Decode, TypeInfo, Debug)]
 pub enum FTokenAction {
@@ -48,3 +49,4 @@ pub enum FTokenStateReply {
     TransactionStatus(Option<TransactionStatus>),
     FTLogicId(ActorId),
 }
+

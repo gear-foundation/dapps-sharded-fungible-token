@@ -7,11 +7,11 @@ use primitive_types::H256;
 
 const DELAY: u32 = 600_000;
 
-#[derive(Default)]
+#[derive(Default, Encode, Decode, TypeInfo)]
 struct FToken {
     admin: ActorId,
     ft_logic_id: ActorId,
-    transactions: HashMap<H256, TransactionStatus>,
+    transactions: BTreeMap<H256, TransactionStatus>,
 }
 
 static mut FTOKEN: Option<FToken> = None;
