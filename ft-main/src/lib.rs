@@ -1,5 +1,5 @@
 #![no_std]
-use ft_logic_io::*;
+use ft_logic_io::{FTLogicAction, FTLogicEvent, InitFTLogic};
 use ft_main_io::*;
 use gstd::{exec, msg, prelude::*, prog::ProgramGenerator, ActorId};
 use hashbrown::HashMap;
@@ -7,11 +7,11 @@ use primitive_types::H256;
 
 const DELAY: u32 = 600_000;
 
-#[derive(Default, Encode, Decode, TypeInfo)]
+#[derive(Default)]
 struct FToken {
     admin: ActorId,
     ft_logic_id: ActorId,
-    transactions: BTreeMap<H256, TransactionStatus>,
+    transactions: HashMap<H256, TransactionStatus>,
 }
 
 static mut FTOKEN: Option<FToken> = None;
@@ -171,40 +171,12 @@ unsafe extern "C" fn init() {
     FTOKEN = Some(ftoken);
 }
 
-#[no_mangle]
-unsafe extern "C" fn meta_state() -> *mut [i32; 2] {
-    let ftoken = FTOKEN.get_or_insert(Default::default());
-    let query: FTokenState = msg::load().expect("Unable to decode `FTokenState`");
-    let encoded = match query {
-        FTokenState::TransactionStatus(account, transaction_id) => {
-            let transaction_hash = get_hash(&account, transaction_id);
-            let transaction = ftoken.transactions.get(&transaction_hash);
-            FTokenStateReply::TransactionStatus(transaction.copied())
-        }
-        FTokenState::FTLogicId => FTokenStateReply::FTLogicId(ftoken.ft_logic_id),
-    }
-    .encode();
-    gstd::util::to_leak_ptr(encoded)
-}
-
 fn reply_ok() {
     msg::reply(FTokenEvent::Ok, 0).expect("Error in a reply `FTokenEvent::Ok`");
 }
 
 fn reply_err() {
     msg::reply(FTokenEvent::Err, 0).expect("Error in a reply `FTokenEvent::Ok`");
-}
-
-gstd::metadata! {
-    title: "Main Fungible Token contract",
-    init:
-        input: InitFToken,
-    handle:
-        input: FTokenAction,
-        output: FTokenEvent,
-    state:
-        input: FTokenState,
-        output: FTokenStateReply,
 }
 
 pub fn get_hash(account: &ActorId, transaction_id: u64) -> H256 {
@@ -221,4 +193,25 @@ fn send_delayed_clear(transaction_hash: H256) {
         DELAY,
     )
     .expect("Error in sending a delayled message `FTStorageAction::Clear`");
+}
+
+#[no_mangle]
+extern "C" fn state() {
+    let token = unsafe { FTOKEN.as_ref().expect("FToken is not initialized") };
+    let token_state = FTokenState {
+        admin: token.admin,
+        ft_logic_id: token.ft_logic_id,
+        transactions: token
+            .transactions
+            .iter()
+            .map(|(key, value)| (*key, *value))
+            .collect(),
+    };
+    msg::reply(token_state, 0).expect("Failed to share state");
+}
+
+#[no_mangle]
+extern "C" fn metahash() {
+    let metahash: [u8; 32] = include!("../.metahash");
+    msg::reply(metahash, 0).expect("Failed to share metahash");
 }

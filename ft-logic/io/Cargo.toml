@@ -9,3 +9,5 @@ gstd = { git = "https://github.com/gear-tech/gear.git" }
 scale-info = { version = "2.3.0", default-features = false }
 primitive-types = { version = "0.12.1", default-features = false }
 hashbrown = { version = "0.13.1" }
+gmeta = {  git = "https://github.com/gear-tech/gear.git" }
+ft-storage-io = { path = "../../ft-storage/io" }

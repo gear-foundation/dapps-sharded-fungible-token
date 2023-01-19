@@ -2,3 +2,6 @@
 .DS_Store
 .vscode
 target/
+ft-storage/.metahash
+ft-logic/.metahash
+ft-main/.metahash

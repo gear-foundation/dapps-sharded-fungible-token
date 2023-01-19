@@ -11,3 +11,4 @@ hashbrown = { version = "0.13.1" }
 
 [build-dependencies]
 gear-wasm-builder = { git = "https://github.com/gear-tech/gear.git" }
+ft-storage-io = { path = "io" }

@@ -1,6 +1,26 @@
 #![no_std]
+use gmeta::{InOut, Metadata};
 use gstd::{prelude::*, ActorId};
 use primitive_types::H256;
+
+pub struct FStorageMetadata;
+
+impl Metadata for FStorageMetadata {
+    type Init = ();
+    type Handle = InOut<FTStorageAction, FTStorageEvent>;
+    type Others = ();
+    type Reply = ();
+    type Signal = ();
+    type State = FTStorageState;
+}
+
+#[derive(Default, Encode, Decode, TypeInfo)]
+pub struct FTStorageState {
+    pub ft_logic_id: ActorId,
+    pub transaction_status: Vec<(H256, bool)>,
+    pub balances: Vec<(ActorId, u128)>,
+    pub approvals: Vec<(ActorId, Vec<(ActorId, u128)>)>,
+}
 
 #[derive(Encode, Decode, Debug, Copy, Clone, TypeInfo)]
 pub enum FTStorageAction {
@@ -29,22 +49,11 @@ pub enum FTStorageAction {
         recipient: ActorId,
         amount: u128,
     },
-    Clear(H256),
 }
 
 #[derive(Encode, Decode, Clone, Debug, TypeInfo)]
 pub enum FTStorageEvent {
     Ok,
     Err,
-    Balance(u128),
-}
-
-#[derive(Encode, Decode, TypeInfo)]
-pub enum FTStorageState {
-    Balance(ActorId),
-}
-
-#[derive(Encode, Decode, Debug, TypeInfo)]
-pub enum FTStorageStateReply {
     Balance(u128),
 }
