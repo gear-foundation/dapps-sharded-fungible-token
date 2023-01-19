@@ -19,3 +19,4 @@ ft-main-io = { path = "io" }
 
 [dev-dependencies]
 gtest = { git = "https://github.com/gear-tech/gear.git" }
+

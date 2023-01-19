@@ -25,6 +25,12 @@ pub struct FTStorageState {
 #[derive(Encode, Decode, Debug, Copy, Clone, TypeInfo)]
 pub enum FTStorageAction {
     GetBalance(ActorId),
+    GetPermitId(ActorId),
+    IncrementPermitId {
+        transaction_hash: H256,
+        account: ActorId,
+        expected_permit_id: u128,
+    },
     IncreaseBalance {
         transaction_hash: H256,
         account: ActorId,
@@ -56,4 +62,5 @@ pub enum FTStorageEvent {
     Ok,
     Err,
     Balance(u128),
+    PermitId(u128),
 }
