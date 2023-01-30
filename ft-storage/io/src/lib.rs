@@ -3,9 +3,9 @@ use gmeta::{InOut, Metadata};
 use gstd::{prelude::*, ActorId};
 use primitive_types::H256;
 
-pub struct FStorageMetadata;
+pub struct FTStorageMetadata;
 
-impl Metadata for FStorageMetadata {
+impl Metadata for FTStorageMetadata {
     type Init = ();
     type Handle = InOut<FTStorageAction, FTStorageEvent>;
     type Others = ();
@@ -14,12 +14,13 @@ impl Metadata for FStorageMetadata {
     type State = FTStorageState;
 }
 
-#[derive(Default, Encode, Decode, TypeInfo)]
+#[derive(Default, Encode, Decode, TypeInfo, Debug)]
 pub struct FTStorageState {
     pub ft_logic_id: ActorId,
     pub transaction_status: Vec<(H256, bool)>,
     pub balances: Vec<(ActorId, u128)>,
     pub approvals: Vec<(ActorId, Vec<(ActorId, u128)>)>,
+    pub permits: Vec<(ActorId, u128)>,
 }
 
 #[derive(Encode, Decode, Debug, Copy, Clone, TypeInfo)]

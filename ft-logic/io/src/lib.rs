@@ -10,13 +10,13 @@ use instruction::Instruction;
 impl Metadata for FLogicMetadata {
     type Init = In<InitFTLogic>;
     type Handle = InOut<FTLogicAction, FTLogicEvent>;
-    type Others = ();
+    type Others = InOut<Action, ()>;
     type Reply = ();
     type Signal = ();
     type State = FTLogicState;
 }
 
-#[derive(Encode, Decode, TypeInfo)]
+#[derive(Encode, Decode, TypeInfo, Debug)]
 pub struct FTLogicState {
     pub admin: ActorId,
     pub ftoken_id: ActorId,
@@ -26,7 +26,7 @@ pub struct FTLogicState {
     pub id_to_storage: Vec<(String, ActorId)>,
 }
 
-#[derive(Encode, Decode, TypeInfo, Clone)]
+#[derive(Encode, Decode, TypeInfo, Clone, Debug)]
 pub enum TransactionStatus {
     InProgress,
     Success,

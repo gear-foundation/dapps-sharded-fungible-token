@@ -28,6 +28,7 @@ impl FToken {
         let transaction_hash = get_hash(&msg::source(), transaction_id);
         let transaction = self.transactions.get(&transaction_hash);
 
+        //debug!("BEFORE SENDING");
         match transaction {
             None => {
                 // If transaction took place for the first time we set its status to `InProgress`
@@ -56,6 +57,7 @@ impl FToken {
 
     async fn send_message_then_reply(&mut self, transaction_hash: H256, payload: &[u8]) {
         let result = self.send_message(transaction_hash, payload).await;
+        //debug!("REPLY");
         match result {
             Ok(()) => {
                 self.transactions
@@ -149,6 +151,7 @@ impl FToken {
 async fn main() {
     let action: FTokenAction = msg::load().expect("Unable to decode `FTokenAction");
     let ftoken: &mut FToken = unsafe { FTOKEN.get_or_insert(Default::default()) };
+    //debug!("HANDLE");
     match action {
         FTokenAction::Message {
             transaction_id,

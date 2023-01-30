@@ -286,6 +286,11 @@ extern "C" fn state() {
                 )
             })
             .collect(),
+        permits: storage
+            .permits
+            .iter()
+            .map(|(key, value)| (*key, *value))
+            .collect(),
     };
     msg::reply(storage_state, 0).expect("Failed to share state");
 }

@@ -13,7 +13,7 @@ impl Metadata for FMainTokenMetadata {
     type State = FTokenState;
 }
 
-#[derive(Default, Encode, Decode, TypeInfo)]
+#[derive(Default, Encode, Decode, TypeInfo, Debug)]
 pub struct FTokenState {
     pub admin: ActorId,
     pub ft_logic_id: ActorId,
@@ -50,7 +50,7 @@ pub struct InitFToken {
     pub ft_logic_code_hash: H256,
 }
 
-#[derive(Encode, Decode, TypeInfo, Copy, Clone)]
+#[derive(Encode, Decode, TypeInfo, Copy, Clone, Debug)]
 pub enum TransactionStatus {
     InProgress,
     Success,
