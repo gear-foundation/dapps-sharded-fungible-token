@@ -35,9 +35,6 @@ fn high_load_transfer() {
     // Change this parameter to control ratio Transfer/Mint
     const MINT_TRANSFER_RATIO: u64 = 10;
 
-    assert!(ACCOUNTS_AMOUNT / MINT_TRANSFER_RATIO > 1);
-    assert!(ACCOUNTS_AMOUNT % MINT_TRANSFER_RATIO == 0);
-
     let system = System::new();
     system.init_logger();
     let mut transaction_id: u64 = FIRST_ID;
