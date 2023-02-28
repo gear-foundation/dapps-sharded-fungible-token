@@ -14,7 +14,7 @@ hashbrown = { version = "0.13.1" }
 scale-info = { version = "2", default-features = false }
 parity-scale-codec = { version = "3", default-features = false }
 blake2-rfc = { version = "0.2.18", default-features = false }
-gear-core = { git = "https://github.com/gear-tech/gear.git" }
+gear-core = { git = "https://github.com/gear-tech/gear.git", branch = "stable" }
 
 [build-dependencies]
 gear-wasm-builder = { git = "https://github.com/gear-tech/gear.git", branch = "stable"}
@@ -26,5 +26,5 @@ gstd = { git = "https://github.com/gear-tech/gear.git", branch = "stable", featu
 light_sr25519 = { git = "https://github.com/gear-tech/gear.git", branch = "stable" }
 hex-literal = "0.3.4"
 sp-core = { version = "6.0.0", git = "https://github.com/gear-tech/substrate.git", branch = "gear-stable" }
-gclient = { git = "https://github.com/gear-tech/gear.git"}
+gclient = { git = "https://github.com/gear-tech/gear.git", branch = "stable" }
 tokio = "1"
