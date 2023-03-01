@@ -899,7 +899,7 @@ dependencies = [
 
 [[package]]
 name = "ft-logic"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "ft-logic-io",
  "ft-storage-io",
@@ -915,7 +915,7 @@ dependencies = [
 
 [[package]]
 name = "ft-logic-io"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "ft-storage-io",
  "gmeta",
@@ -928,7 +928,7 @@ dependencies = [
 
 [[package]]
 name = "ft-main"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "blake2-rfc",
  "ft-logic-io",
@@ -952,7 +952,7 @@ dependencies = [
 
 [[package]]
 name = "ft-main-io"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "ft-logic-io",
  "gmeta",
@@ -964,7 +964,7 @@ dependencies = [
 
 [[package]]
 name = "ft-storage"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "ft-storage-io",
  "gear-wasm-builder",
