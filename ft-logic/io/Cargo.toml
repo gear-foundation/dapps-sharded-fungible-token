@@ -7,7 +7,7 @@ edition = "2021"
 parity-scale-codec = { version = "3", default-features = false }
 gstd = { git = "https://github.com/gear-tech/gear.git", branch = "testnet" }
 scale-info = { version = "2", default-features = false }
-primitive-types = { version = "0.12.1", default-features = false }
-hashbrown = { version = "0.13.1" }
+primitive-types = { version = "0.12", default-features = false }
+hashbrown = { version = "0.13" }
 gmeta = {  git = "https://github.com/gear-tech/gear.git", branch = "testnet"}
 ft-storage-io = { path = "../../ft-storage/io" }

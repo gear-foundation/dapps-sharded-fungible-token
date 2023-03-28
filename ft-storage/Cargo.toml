@@ -6,8 +6,8 @@ edition = "2021"
 [dependencies]
 gstd = { git = "https://github.com/gear-tech/gear.git", branch = "testnet" }
 ft-storage-io = { path = "io" }
-primitive-types = { version = "0.12.1", default-features = false }
-hashbrown = { version = "0.13.1" }
+primitive-types = { version = "0.12", default-features = false }
+hashbrown = { version = "0.13" }
 
 [build-dependencies]
 gear-wasm-builder = { git = "https://github.com/gear-tech/gear.git", branch = "testnet" }

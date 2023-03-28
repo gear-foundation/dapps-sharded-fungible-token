@@ -8,9 +8,9 @@ gstd = { git = "https://github.com/gear-tech/gear.git", features = ["debug"], br
 ft-logic-io = { path = "../ft-logic/io" }
 ft-main-io = { path = "io" }
 ft-storage-io = { path = "../ft-storage/io" }
-primitive-types = { version = "0.12.1", default-features = false }
-sp-core-hashing = { version = "6.0.0", default-features = false }
-hashbrown = { version = "0.13.1" }
+primitive-types = { version = "0.12", default-features = false }
+sp-core-hashing = { version = "7.0.0", default-features = false }
+hashbrown = { version = "0.13" }
 scale-info = { version = "2", default-features = false }
 parity-scale-codec = { version = "3", default-features = false }
 blake2-rfc = { version = "0.2.18", default-features = false }
