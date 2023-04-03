@@ -2,7 +2,7 @@
 use ft_logic_io::instruction::*;
 use ft_logic_io::*;
 use ft_main_io::LogicAction;
-use gstd::{exec, debug, msg, prelude::*, prog::ProgramGenerator, ActorId};
+use gstd::{debug, exec, msg, prelude::*, prog::ProgramGenerator, ActorId};
 
 mod messages;
 use hashbrown::HashMap;

@@ -1,7 +1,7 @@
 #![no_std]
 use ft_logic_io::{FTLogicAction, FTLogicEvent, InitFTLogic};
 use ft_main_io::*;
-use gstd::{exec, msg, prelude::*, debug,prog::ProgramGenerator, ActorId};
+use gstd::{debug, exec, msg, prelude::*, prog::ProgramGenerator, ActorId};
 use hashbrown::HashMap;
 use primitive_types::H256;
 
@@ -148,18 +148,19 @@ impl FToken {
 
 #[gstd::async_main]
 async fn main() {
-    let bytes =  msg::load_bytes().expect("Unable to load bytes");
+    let bytes = msg::load_bytes().expect("Unable to load bytes");
     let ftoken: &mut FToken = unsafe { FTOKEN.as_mut().expect("The contract is not initialized") };
 
     if bytes[0] == 0 {
         let array: [u8; 8] = bytes[1..=8]
-                .try_into()
-                .expect("Unable to get an array from slice");
-            let transaction_id = u64::from_ne_bytes(array);
-            let payload: Vec<u8> = bytes[9..].to_vec();
-            ftoken.message(transaction_id, &payload).await;
+            .try_into()
+            .expect("Unable to get an array from slice");
+        let transaction_id = u64::from_ne_bytes(array);
+        let payload: Vec<u8> = bytes[9..].to_vec();
+        ftoken.message(transaction_id, &payload).await;
     } else {
-        let action = FTokenInnerAction::decode(&mut &bytes[..]).expect("Unable to decode `FTokenInnerAction`");
+        let action = FTokenInnerAction::decode(&mut &bytes[..])
+            .expect("Unable to decode `FTokenInnerAction`");
         match action {
             FTokenInnerAction::UpdateLogicContract {
                 ft_logic_code_hash,

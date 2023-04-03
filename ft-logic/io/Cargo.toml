@@ -12,3 +12,4 @@ hashbrown = { version = "0.13.1" }
 gmeta = {  git = "https://github.com/gear-tech/gear.git", branch = "testnet"}
 ft-storage-io = { path = "../../ft-storage/io" }
 ft-main-io = { path = "../../ft-main/io" }
+ 
