@@ -1,7 +1,7 @@
 #![no_std]
 use ft_logic_io::{FTLogicAction, FTLogicEvent, InitFTLogic};
 use ft_main_io::*;
-use gstd::{debug, exec, msg, prelude::*, prog::ProgramGenerator, ActorId};
+use gstd::{exec, msg, prelude::*, prog::ProgramGenerator, ActorId};
 use hashbrown::HashMap;
 use primitive_types::H256;
 
