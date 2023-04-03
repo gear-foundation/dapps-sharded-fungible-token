@@ -6,6 +6,7 @@ use hex_literal::hex;
 use sp_core::{sr25519::Pair as Sr25519Pair, Pair};
 use utils::*;
 
+
 #[test]
 fn mint() {
     let system = System::new();
