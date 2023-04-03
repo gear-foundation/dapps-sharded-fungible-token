@@ -23,6 +23,8 @@ init:
 	@echo ──────────── Install toolchains ───────────────
 	@rustup toolchain add nightly
 	@rustup target add wasm32-unknown-unknown --toolchain nightly
+
+pin-toolchain:
 	@rustup toolchain install nightly-2023-03-14 --component llvm-tools-preview
 	@rustup target add wasm32-unknown-unknown --toolchain nightly-2023-03-14
 	@rm -rf ~/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu
