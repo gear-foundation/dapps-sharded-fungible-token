@@ -2,7 +2,7 @@
 use ft_logic_io::instruction::*;
 use ft_logic_io::*;
 use ft_main_io::LogicAction;
-use gstd::{exec, msg, prelude::*, prog::ProgramGenerator, ActorId};
+use gstd::{exec, debug, msg, prelude::*, prog::ProgramGenerator, ActorId};
 
 mod messages;
 use hashbrown::HashMap;
@@ -34,6 +34,7 @@ impl FTLogic {
     async fn message(&mut self, transaction_hash: H256, account: &ActorId, payload: &[u8]) {
         self.assert_main_contract();
         let action = LogicAction::decode(&mut &payload[..]).expect("Can't decode `Action`");
+
         let transaction_status = self
             .transaction_status
             .get(&transaction_hash)

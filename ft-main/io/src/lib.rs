@@ -36,6 +36,19 @@ pub enum FTokenAction {
     MigrateStorageAddresses,
 }
 
+#[derive(Encode, Decode, TypeInfo, Debug)]
+pub enum FTokenInnerAction {
+    Message(Vec<u8>),
+    UpdateLogicContract {
+        ft_logic_code_hash: H256,
+        storage_code_hash: H256,
+    },
+    GetBalance(ActorId),
+    GetPermitId(ActorId),
+    Clear(H256),
+    MigrateStorageAddresses,
+}
+
 #[derive(Encode, Debug, Decode, TypeInfo, Copy, Clone)]
 pub enum LogicAction {
     Mint {
