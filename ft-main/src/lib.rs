@@ -1,7 +1,7 @@
 #![no_std]
 use ft_logic_io::{FTLogicAction, FTLogicEvent, InitFTLogic};
 use ft_main_io::*;
-use gstd::{exec, msg, prelude::*, prog::ProgramGenerator, debug, ActorId};
+use gstd::{exec, msg, prelude::*, prog::ProgramGenerator, ActorId};
 use hashbrown::HashMap;
 use primitive_types::H256;
 
@@ -28,7 +28,6 @@ impl FToken {
         let transaction_hash = get_hash(&msg::source(), transaction_id);
         let transaction = self.transactions.get(&transaction_hash);
 
-        //debug!("BEFORE SENDING");
         match transaction {
             None => {
                 // If transaction took place for the first time we set its status to `InProgress`
@@ -157,8 +156,6 @@ async fn main() {
             .expect("Unable to get an array from slice");
         let transaction_id = u64::from_ne_bytes(array);
         let payload: Vec<u8> = message[9..].to_vec();
-        debug!("Bytes {:?}", array);
-        debug!("Transaction id {:?}", transaction_id);
         ftoken.message(transaction_id, &payload).await;
     } else {
         let action =

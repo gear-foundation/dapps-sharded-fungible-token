@@ -1,6 +1,6 @@
 use ft_main_io::*;
 use gstd::{prelude::*, ActorId};
-use gtest::{Program, System, Log};
+use gtest::{Log, Program, System};
 use sp_core::sr25519::Signature;
 
 pub trait FToken {
@@ -172,13 +172,17 @@ impl FToken for Program<'_> {
 
     fn check_balance(&self, account: impl Into<ActorId>, expected_amount: u128) {
         let res = self.send(HARDCODED_ACCOUNT, FTokenAction::GetBalance(account.into()));
-        let payload = Log::builder().dest(HARDCODED_ACCOUNT).payload(FTokenEvent::Balance(expected_amount));
+        let payload = Log::builder()
+            .dest(HARDCODED_ACCOUNT)
+            .payload(FTokenEvent::Balance(expected_amount));
         assert!(res.contains(&payload));
     }
 
     fn check_permit_id(&self, account: [u8; 32], expected_permit_id: u128) {
         let res = self.send(HARDCODED_ACCOUNT, FTokenAction::GetPermitId(account.into()));
-        let payload = Log::builder().dest(HARDCODED_ACCOUNT).payload(FTokenEvent::PermitId(expected_permit_id));
+        let payload = Log::builder()
+            .dest(HARDCODED_ACCOUNT)
+            .payload(FTokenEvent::PermitId(expected_permit_id));
         assert!(res.contains(&payload));
     }
 
