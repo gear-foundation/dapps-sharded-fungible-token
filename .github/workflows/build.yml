@@ -36,15 +36,15 @@ jobs:
           wget -c https://github.com/WebAssembly/binaryen/releases/download/version_110/binaryen-version_110-x86_64-linux.tar.gz -O - | tar -xz -C .
           sudo cp binaryen-version_110/bin/wasm-opt /usr/bin/
 
-      - name: Pin toolchain
-        run: make pin-toolchain
-
       - name: Check fmt
         run: make fmt-check
 
       - name: Run linter
         run: make linter
 
+      - name: Pin toolchain
+        run: make pin-toolchain
+        
       - name: Run tests
         run: make test
 
