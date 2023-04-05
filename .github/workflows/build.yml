@@ -39,10 +39,10 @@ jobs:
           sudo cp binaryen-version_110/bin/wasm-opt /usr/bin/
 
       - name: Check fmt
-        run: make fmt
+        run: make fmt-check
 
       - name: Run linter
-        run: make lint
+        run: make linter
 
       - name: Pin toolchain
         run: make pin-toolchain
