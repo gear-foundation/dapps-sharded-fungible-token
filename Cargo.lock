@@ -917,7 +917,7 @@ dependencies = [
 
 [[package]]
 name = "ft-logic"
-version = "2.0.0"
+version = "2.1.0"
 dependencies = [
  "ft-logic-io",
  "ft-main-io",
@@ -934,7 +934,7 @@ dependencies = [
 
 [[package]]
 name = "ft-logic-io"
-version = "2.0.0"
+version = "2.1.0"
 dependencies = [
  "ft-main-io",
  "ft-storage-io",
@@ -948,7 +948,7 @@ dependencies = [
 
 [[package]]
 name = "ft-main"
-version = "2.0.0"
+version = "2.1.0"
 dependencies = [
  "blake2-rfc",
  "ft-logic-io",
@@ -972,7 +972,7 @@ dependencies = [
 
 [[package]]
 name = "ft-main-io"
-version = "2.0.0"
+version = "2.1.0"
 dependencies = [
  "gmeta",
  "gstd 0.1.0 (git+https://github.com/gear-tech/gear.git?branch=testnet)",
@@ -983,7 +983,7 @@ dependencies = [
 
 [[package]]
 name = "ft-storage"
-version = "2.0.0"
+version = "2.1.0"
 dependencies = [
  "ft-storage-io",
  "gear-wasm-builder",
@@ -994,7 +994,7 @@ dependencies = [
 
 [[package]]
 name = "ft-storage-io"
-version = "2.0.0"
+version = "2.1.0"
 dependencies = [
  "gmeta",
  "gstd 0.1.0 (git+https://github.com/gear-tech/gear.git?branch=testnet)",
@@ -1116,7 +1116,7 @@ dependencies = [
 [[package]]
 name = "galloc"
 version = "0.1.0"
-source = "git+https://github.com/gear-tech/gear.git#f4b671b1b15a411a04e40c2e08106558acab942b"
+source = "git+https://github.com/gear-tech/gear.git#f486be555877e1295732432ee663efe67267d86d"
 dependencies = [
  "dlmalloc",
 ]
@@ -1124,7 +1124,7 @@ dependencies = [
 [[package]]
 name = "gclient"
 version = "0.1.0"
-source = "git+https://github.com/gear-tech/gear.git#f4b671b1b15a411a04e40c2e08106558acab942b"
+source = "git+https://github.com/gear-tech/gear.git#f486be555877e1295732432ee663efe67267d86d"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1156,7 +1156,7 @@ dependencies = [
 [[package]]
 name = "gcore"
 version = "0.1.0"
-source = "git+https://github.com/gear-tech/gear.git#f4b671b1b15a411a04e40c2e08106558acab942b"
+source = "git+https://github.com/gear-tech/gear.git#f486be555877e1295732432ee663efe67267d86d"
 dependencies = [
  "gear-core-errors 0.1.0 (git+https://github.com/gear-tech/gear.git)",
  "gsys 0.1.0 (git+https://github.com/gear-tech/gear.git)",
@@ -1215,7 +1215,7 @@ dependencies = [
 [[package]]
 name = "gear-core"
 version = "0.1.0"
-source = "git+https://github.com/gear-tech/gear.git#f4b671b1b15a411a04e40c2e08106558acab942b"
+source = "git+https://github.com/gear-tech/gear.git#f486be555877e1295732432ee663efe67267d86d"
 dependencies = [
  "blake2-rfc",
  "derive_more",
@@ -1243,7 +1243,7 @@ dependencies = [
 [[package]]
 name = "gear-core-errors"
 version = "0.1.0"
-source = "git+https://github.com/gear-tech/gear.git#f4b671b1b15a411a04e40c2e08106558acab942b"
+source = "git+https://github.com/gear-tech/gear.git#f486be555877e1295732432ee663efe67267d86d"
 dependencies = [
  "derive_more",
  "enum-iterator",
@@ -1268,7 +1268,7 @@ dependencies = [
 [[package]]
 name = "gear-utils"
 version = "0.1.0"
-source = "git+https://github.com/gear-tech/gear.git#f4b671b1b15a411a04e40c2e08106558acab942b"
+source = "git+https://github.com/gear-tech/gear.git#f486be555877e1295732432ee663efe67267d86d"
 dependencies = [
  "env_logger",
  "nonempty",
@@ -1304,7 +1304,7 @@ dependencies = [
 [[package]]
 name = "gear-wasm-instrument"
 version = "0.1.0"
-source = "git+https://github.com/gear-tech/gear.git#f4b671b1b15a411a04e40c2e08106558acab942b"
+source = "git+https://github.com/gear-tech/gear.git#f486be555877e1295732432ee663efe67267d86d"
 dependencies = [
  "enum-iterator",
  "wasm-instrument",
@@ -1391,7 +1391,7 @@ dependencies = [
 [[package]]
 name = "gsdk"
 version = "0.1.0"
-source = "git+https://github.com/gear-tech/gear.git#f4b671b1b15a411a04e40c2e08106558acab942b"
+source = "git+https://github.com/gear-tech/gear.git#f486be555877e1295732432ee663efe67267d86d"
 dependencies = [
  "anyhow",
  "async-recursion",
@@ -1433,7 +1433,7 @@ dependencies = [
 [[package]]
 name = "gstd"
 version = "0.1.0"
-source = "git+https://github.com/gear-tech/gear.git#f4b671b1b15a411a04e40c2e08106558acab942b"
+source = "git+https://github.com/gear-tech/gear.git#f486be555877e1295732432ee663efe67267d86d"
 dependencies = [
  "bs58",
  "futures",
@@ -1461,7 +1461,7 @@ dependencies = [
 [[package]]
 name = "gstd-codegen"
 version = "0.1.0"
-source = "git+https://github.com/gear-tech/gear.git#f4b671b1b15a411a04e40c2e08106558acab942b"
+source = "git+https://github.com/gear-tech/gear.git#f486be555877e1295732432ee663efe67267d86d"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1476,7 +1476,7 @@ source = "git+https://github.com/gear-tech/gear.git?branch=testnet#f4b671b1b15a4
 [[package]]
 name = "gsys"
 version = "0.1.0"
-source = "git+https://github.com/gear-tech/gear.git#f4b671b1b15a411a04e40c2e08106558acab942b"
+source = "git+https://github.com/gear-tech/gear.git#f486be555877e1295732432ee663efe67267d86d"
 
 [[package]]
 name = "gtest"
