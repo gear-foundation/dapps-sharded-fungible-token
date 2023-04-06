@@ -36,9 +36,6 @@ pub enum FTokenAction {
     MigrateStorageAddresses,
 }
 
-<<<<<<< HEAD
-#[derive(Debug, Encode, Decode, TypeInfo, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
-=======
 #[derive(Encode, Decode, TypeInfo, Debug)]
 pub enum FTokenInnerAction {
     Message(Vec<u8>),
@@ -80,8 +77,7 @@ pub enum LogicAction {
     },
 }
 
-#[derive(Encode, Decode, TypeInfo, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
->>>>>>> master
+#[derive(Debug, Encode, Decode, TypeInfo, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub enum FTokenEvent {
     Ok,
     Err,
