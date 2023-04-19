@@ -4,7 +4,7 @@ version = "2.1.0"
 edition = "2021"
 
 [dependencies]
-gstd = { git = "https://github.com/gear-tech/gear.git", branch = "testnet", features = ["debug"] }
+gstd = { git = "https://github.com/gear-tech/gear.git", branch = "academy-v0.1.0", features = ["debug"] }
 ft-logic-io = { path = "io" }
 ft-main-io = { path = "../ft-main/io" }
 ft-storage-io = { path = "../ft-storage/io" }
@@ -14,9 +14,9 @@ light_sr25519 = { git = "https://github.com/gear-tech/gear.git", branch = "testn
 hashbrown = "0.13.1"
 
 [dev-dependencies]
-gtest = { git = "https://github.com/gear-tech/gear.git", branch = "testnet" }
+gtest = { git = "https://github.com/gear-tech/gear.git", branch = "academy-v0.1.0" }
 tokio = { version = "1.26.0", features = ["full"] }
 
 [build-dependencies]
-gear-wasm-builder = { git = "https://github.com/gear-tech/gear.git", branch = "testnet" }
+gear-wasm-builder = { git = "https://github.com/gear-tech/gear.git", branch = "academy-v0.1.0" }
 ft-logic-io = { path = "io" }
