@@ -17,6 +17,7 @@ blake2-rfc = { version = "0.2.18", default-features = false }
 gear-core = { git = "https://github.com/gear-tech/gear.git", rev = "78dfa07ed34df6cf76f09d6c34834b5bd74e352d" }
 
 [build-dependencies]
+gmeta = { git = "https://github.com/gear-tech/gear.git", rev = "78dfa07ed34df6cf76f09d6c34834b5bd74e352d" }
 gear-wasm-builder = { git = "https://github.com/gear-tech/gear.git", rev = "78dfa07ed34df6cf76f09d6c34834b5bd74e352d" }
 ft-main-io = { path = "io" }
 
