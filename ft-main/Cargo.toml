@@ -1,10 +1,10 @@
 [package]
 name = "ft-main"
-version = "2.1.1"
+version = "2.1.2"
 edition = "2021"
 
 [dependencies]
-gstd = { git = "https://github.com/gear-tech/gear.git", features = ["debug"], rev = "5c685d0f15c412ab6ee019ceaf7ce084426dfb68" }
+gstd = { git = "https://github.com/gear-tech/gear.git", features = ["debug"], rev = "78dfa07ed34df6cf76f09d6c34834b5bd74e352d" }
 ft-logic-io = { path = "../ft-logic/io" }
 ft-main-io = { path = "io" }
 ft-storage-io = { path = "../ft-storage/io" }
@@ -14,17 +14,17 @@ hashbrown = { version = "0.13" }
 scale-info = { version = "2", default-features = false }
 parity-scale-codec = { version = "3", default-features = false }
 blake2-rfc = { version = "0.2.18", default-features = false }
-gear-core = { git = "https://github.com/gear-tech/gear.git", rev = "5c685d0f15c412ab6ee019ceaf7ce084426dfb68" }
+gear-core = { git = "https://github.com/gear-tech/gear.git", rev = "78dfa07ed34df6cf76f09d6c34834b5bd74e352d" }
 
 [build-dependencies]
-gear-wasm-builder = { git = "https://github.com/gear-tech/gear.git", rev = "5c685d0f15c412ab6ee019ceaf7ce084426dfb68" }
+gear-wasm-builder = { git = "https://github.com/gear-tech/gear.git", rev = "78dfa07ed34df6cf76f09d6c34834b5bd74e352d" }
 ft-main-io = { path = "io" }
 
 [dev-dependencies]
-gtest = { git = "https://github.com/gear-tech/gear.git", rev = "5c685d0f15c412ab6ee019ceaf7ce084426dfb68" }
-gstd = { git = "https://github.com/gear-tech/gear.git", rev = "5c685d0f15c412ab6ee019ceaf7ce084426dfb68", features = ["debug"] }
-light_sr25519 = { git = "https://github.com/gear-tech/gear.git", rev = "5c685d0f15c412ab6ee019ceaf7ce084426dfb68" }
+gtest = { git = "https://github.com/gear-tech/gear.git", rev = "78dfa07ed34df6cf76f09d6c34834b5bd74e352d" }
+gstd = { git = "https://github.com/gear-tech/gear.git", rev = "78dfa07ed34df6cf76f09d6c34834b5bd74e352d", features = ["debug"] }
+light_sr25519 = { git = "https://github.com/gear-tech/gear.git", rev = "78dfa07ed34df6cf76f09d6c34834b5bd74e352d" }
 hex-literal = "0.4.1"
 sp-core = { git = "https://github.com/gear-tech/substrate.git", rev = "36699c4478ce8ae05517bb42a1b115403313e083" }
-gclient = { git = "https://github.com/gear-tech/gear.git", rev = "5c685d0f15c412ab6ee019ceaf7ce084426dfb68" }
+gclient = { git = "https://github.com/gear-tech/gear.git", rev = "78dfa07ed34df6cf76f09d6c34834b5bd74e352d" }
 tokio = "1"

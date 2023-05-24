@@ -1,48 +1,37 @@
-.PHONY: all build clean fmt fmt-check init linter pre-commit test
+.PHONY: all build fmt init lint pre-commit test full-test deps
+
+NIGHTLY_TOOLCHAIN_VERSION ?= 2023-04-25
+TARGET = `rustc -Vv | grep 'host: ' | sed 's/^host: \(.*\)/\1/'`
 
 all: init build test
 
 build:
-	@echo ──────────── Build release ────────────────────
-	@cargo +nightly build --release
-	@ls -l ./target/wasm32-unknown-unknown/release/*.wasm
-
-clean:
-	@echo ──────────── Clean ────────────────────────────
-	@rm -rvf target
+	@echo ⚙️ Building a release...
+	@cargo +nightly b -r --workspace
+	@ls -l target/wasm32-unknown-unknown/release/*.wasm
 
 fmt:
-	@echo ──────────── Format ───────────────────────────
-	@cargo fmt --all
-
-fmt-check:
-	@echo ──────────── Check format ─────────────────────
-	@cargo fmt --all -- --check
+	@echo ⚙️ Checking a format...
+	@cargo fmt --all --check
 
 init:
-	@echo ──────────── Install toolchains ───────────────
-	@rustup toolchain add nightly
-	@rustup target add wasm32-unknown-unknown --toolchain nightly
+	@echo ⚙️ Installing a toolchain \& a target...
+	@rustup toolchain install nightly-$(NIGHTLY_TOOLCHAIN_VERSION) --component llvm-tools-preview --component clippy
+	@rustup target add wasm32-unknown-unknown --toolchain nightly-$(NIGHTLY_TOOLCHAIN_VERSION)
+	@rm -rf ~/.rustup/toolchains/nightly-$(TARGET)
+	@ln -s ~/.rustup/toolchains/nightly-$(NIGHTLY_TOOLCHAIN_VERSION)-$(TARGET) ~/.rustup/toolchains/nightly-$(TARGET)
 
-pin-toolchain-mac-m1:
-	@rustup toolchain install nightly-2023-03-14 --component llvm-tools-preview
-	@rustup target add wasm32-unknown-unknown --toolchain nightly-2023-03-14
-	@rm -rf ~/.rustup/toolchains/nightly-aarch64-apple-darwin
-	@ln -s ~/.rustup/toolchains/nightly-2023-03-14-aarch64-apple-darwin ~/.rustup/toolchains/nightly-aarch64-apple-darwin
+lint:
+	@echo ⚙️ Running the linter...
+	@cargo +nightly clippy --workspace --all-targets -- -D warnings
 
-pin-toolchain-linux:
-	@rustup toolchain install nightly-2023-03-14 --component llvm-tools-preview
-	@rustup target add wasm32-unknown-unknown --toolchain nightly-2023-03-14
-	@rm -rf ~/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu
-	@ln -s ~/.rustup/toolchains/nightly-2023-03-14-x86_64-unknown-linux-gnu ~/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu
-	@rustup component add clippy --toolchain nightly-x86_64-unknown-linux-gnu
+pre-commit: fmt lint full-test
 
-linter:
-	@echo ──────────── Run linter ───────────────────────
-	@cargo +nightly clippy --all-targets -- --no-deps -D warnings
+test:
+	@echo ⚙️ Running unit tests...
+	@cargo +nightly t
 
-pre-commit: fmt linter test
-
-test: build
-	@echo ──────────── Run tests ────────────────────────
-	@cargo +nightly test --release
+full-test:
+	@echo ⚙️ Running all tests...
+# TODO: remove the `test-thread` option when multithread tests will be allowed.
+	@cargo +nightly t -- --include-ignored --test-threads=1

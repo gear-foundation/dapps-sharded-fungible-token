@@ -1,22 +1,22 @@
 [package]
 name = "ft-logic"
-version = "2.1.1"
+version = "2.1.2"
 edition = "2021"
 
 [dependencies]
-gstd = { git = "https://github.com/gear-tech/gear.git", rev = "5c685d0f15c412ab6ee019ceaf7ce084426dfb68", features = ["debug"] }
+gstd = { git = "https://github.com/gear-tech/gear.git", rev = "78dfa07ed34df6cf76f09d6c34834b5bd74e352d", features = ["debug"] }
 ft-logic-io = { path = "io" }
 ft-main-io = { path = "../ft-main/io" }
 ft-storage-io = { path = "../ft-storage/io" }
 primitive-types = { version = "0.12", default-features = false, features = ["scale-info"]}
 hex = { version = "0.4.3", default-features = false, features = ["alloc"] }
-light_sr25519 = { git = "https://github.com/gear-tech/gear.git", rev = "5c685d0f15c412ab6ee019ceaf7ce084426dfb68" }
+light_sr25519 = { git = "https://github.com/gear-tech/gear.git", rev = "78dfa07ed34df6cf76f09d6c34834b5bd74e352d" }
 hashbrown = "0.13.1"
 
 [dev-dependencies]
-gtest = { git = "https://github.com/gear-tech/gear.git", rev = "5c685d0f15c412ab6ee019ceaf7ce084426dfb68" }
-tokio = { version = "1.26.0", features = ["full"] }
+gtest = { git = "https://github.com/gear-tech/gear.git", rev = "78dfa07ed34df6cf76f09d6c34834b5bd74e352d" }
+tokio = { version = "1", features = ["full"] }
 
 [build-dependencies]
-gear-wasm-builder = { git = "https://github.com/gear-tech/gear.git", rev = "5c685d0f15c412ab6ee019ceaf7ce084426dfb68" }
+gear-wasm-builder = { git = "https://github.com/gear-tech/gear.git", rev = "78dfa07ed34df6cf76f09d6c34834b5bd74e352d" }
 ft-logic-io = { path = "io" }
