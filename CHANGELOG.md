@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.1.3] - 2023-06-30
 ### Changed
-- Update dependencies, pin gear libs to `v0.2.1` tag.
+- Update dependencies, pin gear libs to `#cfb433a` commit.
+
 ## [2.1.2] - 2023-05-24
 ### Changed
 - Update dependencies, pin gear libs to `#78dfa07` commit.

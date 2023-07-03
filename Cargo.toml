@@ -18,14 +18,14 @@ gclient = { git = "https://github.com/gear-tech/gear", rev = "cfb433a" }
 gtest = { git = "https://github.com/gear-tech/gear", rev = "cfb433a" }
 gmeta = { git = "https://github.com/gear-tech/gear", rev = "cfb433a" }
 gstd = { git = "https://github.com/gear-tech/gear", rev = "cfb433a" }
-sp-core = { git = "https://github.com/gear-tech/substrate.git", rev = "36699c4478ce8ae05517bb42a1b115403313e083" }
+light_sr25519 = { git = "https://github.com/gear-tech/gear", rev = "cfb433a" }
+gear-lib = { git = "https://github.com/gear-dapps/gear-lib", tag = "0.3.8" }
+sp-core = { git = "https://github.com/gear-tech/substrate", rev = "36699c4" }
 ft-logic-io.path = "ft-logic/io"
 ft-main-io.path = "ft-main/io"
 ft-storage-io.path = "ft-storage/io"
 scale-info = { version = "2", default-features = false }
 parity-scale-codec = { version = "3", default-features = false }
 hashbrown = "0.13"
-primitive-types = { version = "0.12", default-features = false, features = ["scale-info"]}
-gear-lib = { git = "https://github.com/gear-dapps/gear-lib", tag = "0.3.8" }
+primitive-types = { version = "0.12", default-features = false }
 tokio = "1"
-light_sr25519 = { git = "https://github.com/gear-tech/gear.git", rev = "cfb433a" }
