@@ -1739,7 +1739,7 @@ dependencies = [
 [[package]]
 name = "gstd-fluent"
 version = "0.1.0"
-source = "git+https://github.com/gear-foundation/gstd-fluent.git?branch=into-trait-bound#ba914380a18306be75f75381031a694c5f5a7156"
+source = "git+https://github.com/gear-foundation/gstd-fluent.git?branch=into-trait-bound#5db819f81e035da7bafc6c639e39fbde3e769c90"
 dependencies = [
  "gstd 0.2.2 (git+https://github.com/gear-tech/gear?rev=f4407fa)",
 ]
@@ -4654,7 +4654,7 @@ checksum = "97fee6b57c6a41524a810daee9286c02d7752c4253064d0b05472833a438f675"
 dependencies = [
  "cfg-if",
  "digest 0.10.7",
- "rand 0.8.5",
+ "rand 0.7.3",
  "static_assertions",
 ]
 
