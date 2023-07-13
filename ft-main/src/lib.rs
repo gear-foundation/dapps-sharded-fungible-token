@@ -1,7 +1,10 @@
 #![no_std]
 use ft_logic_io::{FTLogicAction, FTLogicEvent, InitFTLogic};
 use ft_main_io::*;
-use gstd::{exec, msg, prelude::*, prog::ProgramGenerator, ActorId};
+use gstd_fluent::{
+    self as builder,
+    gstd::{exec, msg, prelude::*, ActorId},
+};
 use hashbrown::HashMap;
 use primitive_types::H256;
 
@@ -72,16 +75,16 @@ impl FToken {
     }
 
     async fn send_message(&self, transaction_hash: H256, payload: &[u8]) -> Result<(), ()> {
-        let result = msg::send_for_reply_as::<_, FTLogicEvent>(
+        let result = builder::send(
             self.ft_logic_id,
             FTLogicAction::Message {
                 transaction_hash,
                 account: msg::source(),
                 payload: payload.to_vec(),
             },
-            0,
-            0,
         )
+        .for_reply_as::<FTLogicEvent>()
+        .execute()
         .expect("Error in sending a message to the fungible logic contract")
         .await;
         match result {
@@ -91,48 +94,44 @@ impl FToken {
     }
 
     async fn get_balance(&self, account: &ActorId) {
-        let reply = msg::send_for_reply_as::<_, FTLogicEvent>(
-            self.ft_logic_id,
-            FTLogicAction::GetBalance(*account),
-            0,
-            0,
-        )
-        .expect("Error in sending a message `FTLogicGetBalance")
-        .await
-        .expect("Unable to decode `FTLogicEvent");
+        let reply = builder::send(self.ft_logic_id, FTLogicAction::GetBalance(*account))
+            .for_reply_as::<FTLogicEvent>()
+            .execute()
+            .expect("Error in sending a message `FTLogicGetBalance")
+            .await
+            .expect("Unable to decode `FTLogicEvent");
         if let FTLogicEvent::Balance(balance) = reply {
-            msg::reply(FTokenEvent::Balance(balance), 0)
+            builder::reply(FTokenEvent::Balance(balance))
+                .execute()
                 .expect("Error in a reply `FTokenEvent::Balance`");
         }
     }
 
     async fn get_permit_id(&self, account: &ActorId) {
-        let reply = msg::send_for_reply_as::<_, FTLogicEvent>(
-            self.ft_logic_id,
-            FTLogicAction::GetPermitId(*account),
-            0,
-            0,
-        )
-        .expect("Error in sending a message `FTLogic::GetPermitId")
-        .await
-        .expect("Unable to decode `FTLogicEvent");
+        let reply = builder::send(self.ft_logic_id, FTLogicAction::GetPermitId(*account))
+            .for_reply_as::<FTLogicEvent>()
+            .execute()
+            .expect("Error in sending a message `FTLogic::GetPermitId")
+            .await
+            .expect("Unable to decode `FTLogicEvent");
         if let FTLogicEvent::PermitId(permit_id) = reply {
-            msg::reply(FTokenEvent::PermitId(permit_id), 0)
+            builder::reply(FTokenEvent::PermitId(permit_id))
+                .execute()
                 .expect("Error in a reply `FTokenEvent::PermitId`");
         }
     }
 
     fn update_logic_contract(&mut self, ft_logic_code_hash: H256, storage_code_hash: H256) {
         self.assert_admin();
-        let (_message_id, ft_logic_id) = ProgramGenerator::create_program(
+        let (_message_id, ft_logic_id) = builder::create_program(
             ft_logic_code_hash.into(),
             InitFTLogic {
                 admin: msg::source(),
                 storage_code_hash,
             }
             .encode(),
-            0,
         )
+        .execute()
         .expect("Error in creating FToken Logic program");
         self.ft_logic_id = ft_logic_id;
     }
@@ -180,15 +179,15 @@ async fn main() {
 #[no_mangle]
 unsafe extern "C" fn init() {
     let init_config: InitFToken = msg::load().expect("Unable to decode `InitFToken`");
-    let (_message_id, ft_logic_id) = ProgramGenerator::create_program(
+    let (_message_id, ft_logic_id) = builder::create_program(
         init_config.ft_logic_code_hash.into(),
         InitFTLogic {
             admin: msg::source(),
             storage_code_hash: init_config.storage_code_hash,
         }
         .encode(),
-        0,
     )
+    .execute()
     .expect("Error in creating FToken Logic program");
     let ftoken = FToken {
         admin: msg::source(),
@@ -200,11 +199,15 @@ unsafe extern "C" fn init() {
 }
 
 fn reply_ok() {
-    msg::reply(FTokenEvent::Ok, 0).expect("Error in a reply `FTokenEvent::Ok`");
+    builder::reply(FTokenEvent::Ok)
+        .execute()
+        .expect("Error in a reply `FTokenEvent::Ok`");
 }
 
 fn reply_err() {
-    msg::reply(FTokenEvent::Err, 0).expect("Error in a reply `FTokenEvent::Ok`");
+    builder::reply(FTokenEvent::Err)
+        .execute()
+        .expect("Error in a reply `FTokenEvent::Ok`");
 }
 
 pub fn get_hash(account: &ActorId, transaction_id: u64) -> H256 {
@@ -214,13 +217,10 @@ pub fn get_hash(account: &ActorId, transaction_id: u64) -> H256 {
 }
 
 fn send_delayed_clear(transaction_hash: H256) {
-    msg::send_delayed(
-        exec::program_id(),
-        FTokenAction::Clear(transaction_hash),
-        0,
-        DELAY,
-    )
-    .expect("Error in sending a delayled message `FTStorageAction::Clear`");
+    builder::send(exec::program_id(), FTokenAction::Clear(transaction_hash))
+        .with_delay(DELAY)
+        .execute()
+        .expect("Error in sending a delayled message `FTStorageAction::Clear`");
 }
 
 #[no_mangle]
@@ -235,5 +235,7 @@ extern "C" fn state() {
             .map(|(key, value)| (*key, *value))
             .collect(),
     };
-    msg::reply(token_state, 0).expect("Failed to share state");
+    builder::reply(token_state)
+        .execute()
+        .expect("Failed to share state");
 }

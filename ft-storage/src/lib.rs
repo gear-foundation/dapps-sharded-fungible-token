@@ -1,6 +1,9 @@
 #![no_std]
 use ft_storage_io::*;
-use gstd::{msg, prelude::*, ActorId};
+use gstd_fluent::{
+    self as builder,
+    gstd::{msg, prelude::*, ActorId},
+};
 use hashbrown::HashMap;
 use primitive_types::H256;
 
@@ -18,7 +21,9 @@ static mut FT_STORAGE: Option<FTStorage> = None;
 impl FTStorage {
     fn get_permit_id(&self, account: &ActorId) {
         let permit_id = self.permits.get(account).unwrap_or(&0);
-        msg::reply(FTStorageEvent::PermitId(*permit_id), 0).expect("");
+        builder::reply(FTStorageEvent::PermitId(*permit_id))
+            .execute()
+            .expect("");
     }
 
     fn check_and_increment_permit_id(
@@ -52,7 +57,9 @@ impl FTStorage {
 
     fn get_balance(&self, account: &ActorId) {
         let balance = self.balances.get(account).unwrap_or(&0);
-        msg::reply(FTStorageEvent::Balance(*balance), 0).expect("");
+        builder::reply(FTStorageEvent::Balance(*balance))
+            .execute()
+            .expect("");
     }
 
     fn decrease(&mut self, msg_source: &ActorId, sender: &ActorId, amount: u128) -> bool {
@@ -254,11 +261,15 @@ unsafe extern "C" fn init() {
 }
 
 fn reply_ok() {
-    msg::reply(FTStorageEvent::Ok, 0).expect("error in sending a reply `FTStorageEvent::Ok");
+    builder::reply(FTStorageEvent::Ok)
+        .execute()
+        .expect("error in sending a reply `FTStorageEvent::Ok");
 }
 
 fn reply_err() {
-    msg::reply(FTStorageEvent::Err, 0).expect("error in sending a reply `FTStorageEvent::Err");
+    builder::reply(FTStorageEvent::Err)
+        .execute()
+        .expect("error in sending a reply `FTStorageEvent::Err");
 }
 
 #[no_mangle]
@@ -292,5 +303,7 @@ extern "C" fn state() {
             .map(|(key, value)| (*key, *value))
             .collect(),
     };
-    msg::reply(storage_state, 0).expect("Failed to share state");
+    builder::reply(storage_state)
+        .execute()
+        .expect("Failed to share state");
 }

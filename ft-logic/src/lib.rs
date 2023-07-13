@@ -2,7 +2,10 @@
 use ft_logic_io::instruction::*;
 use ft_logic_io::*;
 use ft_main_io::LogicAction;
-use gstd::{exec, msg, prelude::*, prog::ProgramGenerator, ActorId};
+use gstd_fluent::{
+    self as builder,
+    gstd::{exec, msg, prelude::*, ActorId},
+};
 
 mod messages;
 use hashbrown::HashMap;
@@ -338,13 +341,10 @@ impl FTLogic {
         if let Some(address) = self.id_to_storage.get(&id) {
             *address
         } else {
-            let (_message_id, address) = ProgramGenerator::create_program_with_gas(
-                self.storage_code_hash.into(),
-                "",
-                GAS_STORAGE_CREATION,
-                0,
-            )
-            .expect("Error in creating Storage program");
+            let (_message_id, address) = builder::create_program(self.storage_code_hash.into(), "")
+                .with_gas_limit(GAS_STORAGE_CREATION)
+                .execute()
+                .expect("Error in creating Storage program");
             self.id_to_storage.insert(id, address);
             address
         }
@@ -355,10 +355,12 @@ impl FTLogic {
         let id: String = encoded.chars().next().expect("Can't be None").to_string();
         if let Some(address) = self.id_to_storage.get(&id) {
             let permit_id = get_permit_id(address, account).await;
-            msg::reply(FTLogicEvent::PermitId(permit_id), 0)
+            builder::reply(FTLogicEvent::PermitId(permit_id))
+                .execute()
                 .expect("Error in a reply `FTLogicEvent::PermitId`");
         } else {
-            msg::reply(FTLogicEvent::PermitId(0), 0)
+            builder::reply(FTLogicEvent::PermitId(0))
+                .execute()
                 .expect("Error in a reply `FTLogicEvent::PermitId`");
         }
     }
@@ -383,10 +385,12 @@ impl FTLogic {
         let id: String = encoded.chars().next().expect("Can't be None").to_string();
         if let Some(address) = self.id_to_storage.get(&id) {
             let balance = get_balance(address, account).await;
-            msg::reply(FTLogicEvent::Balance(balance), 0)
+            builder::reply(FTLogicEvent::Balance(balance))
+                .execute()
                 .expect("Error in a reply `FTLogicEvent::Balance`");
         } else {
-            msg::reply(FTLogicEvent::Balance(0), 0)
+            builder::reply(FTLogicEvent::Balance(0))
+                .execute()
                 .expect("Error in a reply `FTLogicEvent::Balance`");
         }
     }
@@ -445,21 +449,22 @@ unsafe extern "C" fn init() {
 }
 
 fn reply_err() {
-    msg::reply(FTLogicEvent::Err, 0).expect("Error in sending a reply `FTLogicEvent::Err`");
+    builder::reply(FTLogicEvent::Err)
+        .execute()
+        .expect("Error in sending a reply `FTLogicEvent::Err`");
 }
 
 fn reply_ok() {
-    msg::reply(FTLogicEvent::Ok, 0).expect("Error in sending a reply `FTLogicEvent::Ok`");
+    builder::reply(FTLogicEvent::Ok)
+        .execute()
+        .expect("Error in sending a reply `FTLogicEvent::Ok`");
 }
 
 fn send_delayed_clear(transaction_hash: H256) {
-    msg::send_delayed(
-        exec::program_id(),
-        FTLogicAction::Clear(transaction_hash),
-        0,
-        DELAY,
-    )
-    .expect("Error in sending a delayled message `FTStorageAction::Clear`");
+    builder::send(exec::program_id(), FTLogicAction::Clear(transaction_hash))
+        .with_delay(DELAY)
+        .execute()
+        .expect("Error in sending a delayled message `FTStorageAction::Clear`");
 }
 
 #[no_mangle]
@@ -485,5 +490,7 @@ extern "C" fn state() {
             .map(|(key, value)| (key.clone(), *value))
             .collect(),
     };
-    msg::reply(logic_state, 0).expect("Failed to share state");
+    builder::reply(logic_state)
+        .execute()
+        .expect("Failed to share state");
 }
