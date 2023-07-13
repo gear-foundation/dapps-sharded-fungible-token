@@ -8,6 +8,7 @@ authors.workspace = true
 [dependencies]
 gmeta.workspace = true
 gstd.workspace = true
+gstd-fluent.workspace = true
 scale-info.workspace = true
 parity-scale-codec.workspace = true
 ft-logic-io.workspace = true

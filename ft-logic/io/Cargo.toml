@@ -8,6 +8,7 @@ authors.workspace = true
 [dependencies]
 parity-scale-codec.workspace = true
 gstd.workspace = true
+gstd-fluent.workspace = true
 scale-info.workspace = true
 primitive-types.workspace = true
 hashbrown.workspace = true
