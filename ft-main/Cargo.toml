@@ -23,6 +23,11 @@ tokio.workspace = true
 light_sr25519.workspace = true
 sp-core.workspace = true
 hex-literal = "0.3.4"
+gear-core.workspace = true
+futures = "0.3"
+statrs = "0.16"
+rand = "0.8"
+hex = "0.4"
 
 [build-dependencies]
 gear-wasm-builder.workspace = true

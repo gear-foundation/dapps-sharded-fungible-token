@@ -2,6 +2,7 @@ use ft_main_io::*;
 use gstd::{prelude::*, ActorId};
 use gtest::{Log, Program, System};
 use sp_core::sr25519::Signature;
+use std::{env, path::PathBuf, fs};
 
 pub trait FToken {
     fn ftoken(system: &System) -> Program;
@@ -43,6 +44,17 @@ pub trait FToken {
 }
 
 const HARDCODED_ACCOUNT: u64 = 100;
+
+pub fn current_wasm() -> Vec<u8> {
+    let current_dir = env::current_dir().expect("Unable to get current dir");
+    let path_file = current_dir.join(".binpath");
+    let path_bytes = fs::read(path_file).expect("Unable to read path bytes");
+    let mut relative_path: PathBuf =
+        String::from_utf8(path_bytes).expect("Invalid path").into();
+    relative_path.set_extension("opt.wasm");
+    let wasm_path = current_dir.join(relative_path);
+    fs::read(wasm_path).unwrap()
+}
 
 impl FToken for Program<'_> {
     fn ftoken(system: &System) -> Program {
