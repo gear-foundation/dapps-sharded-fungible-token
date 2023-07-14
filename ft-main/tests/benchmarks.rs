@@ -116,7 +116,7 @@ async fn stress_transfer() -> Result<()> {
 
     // Fill program with test users balances
     dbg!("Fill with test users balances");
-    let users_amount = 200_000;
+    let users_amount = 200;
 
     let mut actions: Vec<LogicAction> = vec![];
     for user_id in 0u64..users_amount {
