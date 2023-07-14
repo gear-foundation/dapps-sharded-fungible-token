@@ -3,7 +3,7 @@ use ft_logic_io::{FTLogicAction, FTLogicEvent, InitFTLogic};
 use ft_main_io::*;
 use gstd_fluent::{
     self as builder,
-    gstd::{exec, msg, prelude::*, ActorId},
+    gstd::{self, exec, msg, prelude::*, ActorId},
 };
 use hashbrown::HashMap;
 use primitive_types::H256;

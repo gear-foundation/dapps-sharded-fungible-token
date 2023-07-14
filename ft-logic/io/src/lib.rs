@@ -1,7 +1,7 @@
 #![no_std]
 use ft_main_io::LogicAction;
 use gmeta::{In, InOut, Metadata};
-use gstd::{prelude::*, ActorId};
+use gstd_fluent::gstd::{prelude::*, ActorId};
 use primitive_types::H256;
 pub struct FLogicMetadata;
 pub mod instruction;

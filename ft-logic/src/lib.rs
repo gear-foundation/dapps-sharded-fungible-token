@@ -4,7 +4,7 @@ use ft_logic_io::*;
 use ft_main_io::LogicAction;
 use gstd_fluent::{
     self as builder,
-    gstd::{exec, msg, prelude::*, ActorId},
+    gstd::{self, exec, msg, prelude::*, ActorId},
 };
 
 mod messages;

@@ -1,5 +1,5 @@
 use ft_main_io::*;
-use gstd::{prelude::*, ActorId};
+use gstd_fluent::gstd::{prelude::*, ActorId};
 use gtest::{Log, Program, System};
 use sp_core::sr25519::Signature;
 
