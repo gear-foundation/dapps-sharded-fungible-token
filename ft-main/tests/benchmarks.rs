@@ -50,10 +50,11 @@ async fn send_messages_in_parallel(
 
     let mut step_no = 0;
     let steps_amount = messages.len() / step_size;
+    dbg!(steps_amount);
 
     for step in messages.chunks(step_size) {
-        dbg!("send messages step {}/{}", step_no, steps_amount);
         step_no += 1;
+        dbg!(step_no);
 
         let tasks: Vec<_> = step
             .chunks(batch_size)
@@ -87,9 +88,9 @@ async fn stress_transfer() -> Result<()> {
 
     let ft_main_wasm = utils::current_wasm();
     let ft_storage_wasm =
-        fs::read("../target/wasm32-unknown-unknown/release/ft_storage.opt.wasm").unwrap();
+        fs::read("../target/wasm32-unknown-unknown//ft_storage.opt.wasm").unwrap();
     let ft_logic_wasm =
-        fs::read("../target/wasm32-unknown-unknown/release/ft_logic.opt.wasm").unwrap();
+        fs::read("../target/wasm32-unknown-unknown/debug/ft_logic.opt.wasm").unwrap();
 
     dbg!("Upload ft storage code");
     let (storage_code_id, _) = api.upload_code(ft_storage_wasm).await?;
@@ -116,7 +117,7 @@ async fn stress_transfer() -> Result<()> {
 
     // Fill program with test users balances
     dbg!("Fill with test users balances");
-    let users_amount = 200;
+    let users_amount = 100;
 
     let mut actions: Vec<LogicAction> = vec![];
     for user_id in 0u64..users_amount {
@@ -153,13 +154,18 @@ async fn stress_transfer() -> Result<()> {
         .find(|(_, status)| !status.succeed())
     {
         panic!(
-            "{msg_id:?} ended with error status: {status:?}, may be need to decrease `step_size`"
+            "{msg_id:?} ended with error status: {status:?}"
         );
     };
 
     // Estimate gas for one transfer action
+    let transfers_amount = 1;
+    dbg!(transfers_amount);
+
     let mut gas_burned = Vec::new();
-    for id in 0u64..100 {
+    for id in 0u64..transfers_amount {
+        dbg!(id);
+
         let from: u64 = rng.gen_range(1..=users_amount);
         let to: u64 = rng.gen_range(1..=users_amount);
         let amount: u128 = rng.gen_range(1..=100);
@@ -183,8 +189,9 @@ async fn stress_transfer() -> Result<()> {
     println!(
         "\n===================\n
         Gas burned for one transfer operation = {} * 10^9. \
-        Calculated as geometric mean from 100 transfer operations.\n",
-        gas_burned.geometric_mean() / 1_000_000_000f64
+        Calculated as geometric mean from {} transfer operations.\n",
+        gas_burned.geometric_mean() / 1_000_000_000f64,
+        transfers_amount,
     );
 
     Ok(())

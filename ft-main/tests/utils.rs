@@ -45,6 +45,7 @@ pub trait FToken {
 
 const HARDCODED_ACCOUNT: u64 = 100;
 
+#[allow(unused)]
 pub fn current_wasm() -> Vec<u8> {
     let current_dir = env::current_dir().expect("Unable to get current dir");
     let path_file = current_dir.join(".binpath");
