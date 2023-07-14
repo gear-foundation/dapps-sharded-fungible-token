@@ -19,9 +19,8 @@
 #![cfg(test)]
 
 use ft_main_io::{FTokenAction, InitFToken, LogicAction};
-use gclient::{EventProcessor, GearApi, Result, WSAddress};
+use gclient::{EventProcessor, GearApi, Result};
 use gear_core::ids::{MessageId, ProgramId};
-use gmeta::Decode;
 use gstd::{vec, Encode, Vec};
 use rand::Rng;
 use statrs::statistics::Statistics;
@@ -187,29 +186,6 @@ async fn stress_transfer() -> Result<()> {
         Calculated as geometric mean from 100 transfer operations.\n",
         gas_burned.geometric_mean() / 1_000_000_000f64
     );
-
-    Ok(())
-}
-
-#[tokio::test]
-async fn lol() -> Result<()> {
-    let mut rng = rand::thread_rng();
-
-    let api = GearApi::init(WSAddress::new("wss://archive-rpc.vara-network.io", 443)).await?;
-
-    // Subscribing for events.
-    // let mut listener = api.subscribe().await?;
-
-    let pid1 = "0f62e2195a8ba2099de98c63a0f44593e9754deb2408b529a133ad80e4e8e166";
-    let pid1 = hex::decode(pid1).unwrap();
-    let pid1 = ProgramId::decode(&mut pid1.as_slice()).unwrap();
-
-    let pid11 = ProgramId::from([0x0f, 0x62, 0xe2, 0x19, 0x5a, 0x8b, 0xa2, 0x09, 0x9d, 0xe9, 0x8c, 0x63, 0xa0, 0xf4, 0x45, 0x93, 0xe9, 0x75, 0x4d, 0xeb, 0x24, 0x08, 0xb5, 0x29, 0xa1, 0x33, 0xad, 0x80, 0xe4, 0xe8, 0xe1, 0x66]);
-
-    assert_eq!(pid1, pid11);
-
-    let x: Vec<u8> = api.read_state(pid1).await?;
-    println!("lol x = {x:?}");
 
     Ok(())
 }

@@ -28,6 +28,9 @@ futures = "0.3"
 statrs = "0.16"
 rand = "0.8"
 hex = "0.4"
+parity-scale-codec.workspace = true
+scale-info.workspace = true
+wasmprinter = "0.2"
 
 [build-dependencies]
 gear-wasm-builder.workspace = true
