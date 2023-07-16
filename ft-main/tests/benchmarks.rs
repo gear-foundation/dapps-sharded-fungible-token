@@ -94,9 +94,9 @@ async fn stress_transfer() -> Result<()> {
 
     let ft_main_wasm = utils::current_wasm();
     let ft_storage_wasm =
-        fs::read("../target/wasm32-unknown-unknown/debug/ft_storage.opt.wasm").unwrap();
+        fs::read("../target/wasm32-unknown-unknown/release/ft_storage.opt.wasm").unwrap();
     let ft_logic_wasm =
-        fs::read("../target/wasm32-unknown-unknown/debug/ft_logic.opt.wasm").unwrap();
+        fs::read("../target/wasm32-unknown-unknown/release/ft_logic.opt.wasm").unwrap();
 
     dbg!("Upload ft storage code");
     let (storage_code_id, _) = api.upload_code(ft_storage_wasm).await?;
