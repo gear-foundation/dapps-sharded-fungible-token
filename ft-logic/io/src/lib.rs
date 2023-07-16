@@ -23,7 +23,7 @@ pub struct FTLogicState {
     pub transaction_status: Vec<(H256, TransactionStatus)>,
     pub instructions: Vec<(H256, (Instruction, Instruction))>,
     pub storage_code_hash: H256,
-    pub id_to_storage: Vec<(u8, Option<ActorId>)>,
+    pub id_to_storage: [Option<ActorId>; 16],
 }
 
 #[derive(Encode, Decode, TypeInfo, Clone, Debug)]

@@ -333,10 +333,14 @@ impl FTLogic {
         self.storage_code_hash = storage_code_hash;
     }
 
+    fn get_id_for_account(account: &ActorId) -> usize{
+        (account.as_ref()[0] / 16) as usize
+    }
+
     fn get_storage_address(&mut self, address: &ActorId) -> ActorId {
         // let encoded = hex::encode(address.as_ref()[0..=0]);
         // let id: String = encoded.chars().next().expect("Can't be None").to_string();
-        let id = (address.as_ref()[0] / 16) as usize;
+        let id = Self::get_id_for_account(address);
         if let Some(ref address) = self.id_to_storage[id] {
             *address
         } else {
@@ -355,7 +359,7 @@ impl FTLogic {
     async fn get_permit_id(&self, account: &ActorId) {
         // let encoded = hex::encode(account.as_ref()[0..=0]);
         // let id: String = encoded.chars().next().expect("Can't be None").to_string();
-        let id = (account.as_ref()[0] / 16) as usize;
+        let id = Self::get_id_for_account(account);
         if let Some(ref address) = self.id_to_storage[id] {
             let permit_id = get_permit_id(address, account).await;
             msg::reply(FTLogicEvent::PermitId(permit_id), 0)
@@ -374,7 +378,7 @@ impl FTLogic {
     ) -> bool {
         // let encoded = hex::encode(account.as_ref()[0..=0]);
         // let id: String = encoded.chars().next().expect("Can't be None").to_string();
-        let id = (account.as_ref()[0] / 16) as usize;
+        let id = Self::get_id_for_account(account);
         if let Some(ref address) = self.id_to_storage[id] {
             return check_and_increment_permit_id(address, transaction_hash, account, *expected_id)
                 .await;
@@ -385,7 +389,7 @@ impl FTLogic {
     async fn get_balance(&self, account: &ActorId) {
         // let encoded = hex::encode(account.as_ref()[0..=0]);
         // let id: String = encoded.chars().next().expect("Can't be None").to_string();
-        let id = (account.as_ref()[0] / 16) as usize;
+        let id = Self::get_id_for_account(account);
         if let Some(ref address) = self.id_to_storage[id] {
             let balance = get_balance(address, account).await;
             msg::reply(FTLogicEvent::Balance(balance), 0)
@@ -486,10 +490,10 @@ extern "C" fn state() {
         storage_code_hash: logic.storage_code_hash,
         id_to_storage: logic
             .id_to_storage
-            .iter()
-            .enumerate()
-            .map(|(key, value)| (key as u8, *value))
-            .collect(),
+            // .iter()
+            // .enumerate()
+            // .map(|(key, value)| (key as u8, *value))
+            // .collect(),
     };
     msg::reply(logic_state, 0).expect("Failed to share state");
 }
