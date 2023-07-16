@@ -23,7 +23,7 @@ impl FTStorage {
 
     fn check_and_increment_permit_id(
         &mut self,
-        transaction_hash: [u8; 40],
+        transaction_hash: TransactionHash,
         account: &ActorId,
         signed_permit_id: &u128,
     ) {
@@ -78,7 +78,7 @@ impl FTStorage {
     }
     fn transfer(
         &mut self,
-        transaction_hash: [u8; 40],
+        transaction_hash: TransactionHash,
         msg_source: &ActorId,
         sender: &ActorId,
         recipient: &ActorId,
@@ -112,7 +112,7 @@ impl FTStorage {
         }
     }
 
-    fn increase_balance(&mut self, transaction_hash: [u8; 40], account: &ActorId, amount: u128) {
+    fn increase_balance(&mut self, transaction_hash: TransactionHash, account: &ActorId, amount: u128) {
         self.assert_ft_contract();
 
         // check transaction status
@@ -136,7 +136,7 @@ impl FTStorage {
 
     fn decrease_balance(
         &mut self,
-        transaction_hash: [u8; 40],
+        transaction_hash: TransactionHash,
         msg_source: &ActorId,
         account: &ActorId,
         amount: u128,
@@ -166,7 +166,7 @@ impl FTStorage {
 
     fn approve(
         &mut self,
-        transaction_hash: [u8; 40],
+        transaction_hash: TransactionHash,
         msg_source: &ActorId,
         account: &ActorId,
         amount: u128,
