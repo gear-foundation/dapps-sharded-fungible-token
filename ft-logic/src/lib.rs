@@ -333,7 +333,7 @@ impl FTLogic {
     }
 
     fn get_storage_address(&mut self, address: &ActorId) -> ActorId {
-        let encoded = hex::encode(address.as_ref());
+        let encoded = hex::encode(address.as_ref()[0..=0]);
         let id: String = encoded.chars().next().expect("Can't be None").to_string();
         if let Some(address) = self.id_to_storage.get(&id) {
             *address
@@ -351,7 +351,7 @@ impl FTLogic {
     }
 
     async fn get_permit_id(&self, account: &ActorId) {
-        let encoded = hex::encode(account.as_ref());
+        let encoded = hex::encode(account.as_ref()[0..=0]);
         let id: String = encoded.chars().next().expect("Can't be None").to_string();
         if let Some(address) = self.id_to_storage.get(&id) {
             let permit_id = get_permit_id(address, account).await;
@@ -369,7 +369,7 @@ impl FTLogic {
         account: &ActorId,
         expected_id: &u128,
     ) -> bool {
-        let encoded = hex::encode(account.as_ref());
+        let encoded = hex::encode(account.as_ref()[0..=0]);
         let id: String = encoded.chars().next().expect("Can't be None").to_string();
         if let Some(address) = self.id_to_storage.get(&id) {
             return check_and_increment_permit_id(address, transaction_hash, account, *expected_id)
@@ -379,7 +379,7 @@ impl FTLogic {
     }
 
     async fn get_balance(&self, account: &ActorId) {
-        let encoded = hex::encode(account.as_ref());
+        let encoded = hex::encode(account.as_ref()[0..=0]);
         let id: String = encoded.chars().next().expect("Can't be None").to_string();
         if let Some(address) = self.id_to_storage.get(&id) {
             let balance = get_balance(address, account).await;
