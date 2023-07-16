@@ -1,4 +1,5 @@
 #![no_std]
+use ft_main_io::TransactionHash;
 use ft_storage_io::*;
 use gstd::{msg, prelude::*, ActorId};
 use hashbrown::HashMap;
@@ -6,7 +7,7 @@ use hashbrown::HashMap;
 #[derive(Default)]
 struct FTStorage {
     ft_logic_id: ActorId,
-    transaction_status: HashMap<[u8; 40], bool>,
+    transaction_status: HashMap<TransactionHash, bool>,
     balances: HashMap<ActorId, u128>,
     approvals: HashMap<ActorId, HashMap<ActorId, u128>>,
     permits: HashMap<ActorId, u128>,

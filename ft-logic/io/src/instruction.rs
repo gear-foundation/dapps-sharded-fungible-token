@@ -1,3 +1,4 @@
+use ft_main_io::TransactionHash;
 use ft_storage_io::{FTStorageAction, FTStorageEvent};
 use gstd::{msg, prelude::*, ActorId, CodeId};
 
@@ -86,7 +87,7 @@ impl Instruction {
 }
 
 pub fn create_decrease_instruction(
-    transaction_hash: [u8; 40],
+    transaction_hash: TransactionHash,
     msg_source: &ActorId,
     sender_storage: &ActorId,
     sender: &ActorId,
@@ -109,7 +110,7 @@ pub fn create_decrease_instruction(
 }
 
 pub fn create_increase_instruction(
-    transaction_hash: [u8; 40],
+    transaction_hash: TransactionHash,
     recipient_storage: &ActorId,
     recipient: &ActorId,
     amount: u128,

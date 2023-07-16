@@ -9,3 +9,4 @@ gstd.workspace = true
 scale-info = { version = "2", default-features = false }
 primitive-types = { version = "0.12.1", default-features = false }
 gmeta.workspace = true
+ft-main-io.workspace = true

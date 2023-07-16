@@ -1,5 +1,5 @@
 #![no_std]
-use ft_main_io::LogicAction;
+use ft_main_io::{LogicAction, TransactionHash};
 use gmeta::{In, InOut, Metadata};
 use gstd::{prelude::*, ActorId, CodeId};
 pub struct FLogicMetadata;
@@ -14,13 +14,12 @@ impl Metadata for FLogicMetadata {
     type Signal = ();
     type State = FTLogicState;
 }
-
 #[derive(Encode, Decode, TypeInfo, Debug)]
 pub struct FTLogicState {
     pub admin: ActorId,
     pub ftoken_id: ActorId,
-    pub transaction_status: Vec<([u8; 40], TransactionStatus)>,
-    pub instructions: Vec<([u8; 40], (Instruction, Instruction))>,
+    pub transaction_status: Vec<(TransactionHash, TransactionStatus)>,
+    pub instructions: Vec<(TransactionHash, (Instruction, Instruction))>,
     pub storage_code_hash: CodeId,
     pub id_to_storage: Vec<(String, ActorId)>,
 }
@@ -35,13 +34,13 @@ pub enum TransactionStatus {
 #[derive(Debug, Encode, Decode, TypeInfo, Clone)]
 pub enum FTLogicAction {
     Message {
-        transaction_hash: [u8; 40],
+        transaction_hash: TransactionHash,
         account: ActorId,
         payload: Vec<u8>,
     },
     GetBalance(ActorId),
     GetPermitId(ActorId),
-    Clear([u8; 40]),
+    Clear(TransactionHash),
     UpdateStorageCodeHash(CodeId),
     MigrateStorages,
 }

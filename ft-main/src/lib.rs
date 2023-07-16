@@ -10,7 +10,7 @@ const DELAY: u32 = 600_000;
 struct FToken {
     admin: ActorId,
     ft_logic_id: ActorId,
-    transactions: HashMap<[u8; 40], TransactionStatus>,
+    transactions: HashMap<TransactionHash, TransactionStatus>,
 }
 
 static mut FTOKEN: Option<FToken> = None;
@@ -53,7 +53,7 @@ impl FToken {
         }
     }
 
-    async fn send_message_then_reply(&mut self, transaction_hash: [u8; 40], payload: &[u8]) {
+    async fn send_message_then_reply(&mut self, transaction_hash: TransactionHash, payload: &[u8]) {
         let result = self.send_message(transaction_hash, payload).await;
         //debug!("REPLY");
         match result {
@@ -70,7 +70,7 @@ impl FToken {
         };
     }
 
-    async fn send_message(&self, transaction_hash: [u8; 40], payload: &[u8]) -> Result<(), ()> {
+    async fn send_message(&self, transaction_hash: TransactionHash, payload: &[u8]) -> Result<(), ()> {
         let result = msg::send_for_reply_as::<_, FTLogicEvent>(
             self.ft_logic_id,
             FTLogicAction::Message {
@@ -143,7 +143,7 @@ impl FToken {
         );
     }
 
-    fn clear(&mut self, transaction_hash: [u8; 40]) {
+    fn clear(&mut self, transaction_hash: TransactionHash) {
         self.transactions.remove(&transaction_hash);
     }
 }
@@ -206,7 +206,7 @@ fn reply_err() {
     msg::reply(FTokenEvent::Err, 0).expect("Error in a reply `FTokenEvent::Ok`");
 }
 
-pub fn get_hash(account: &ActorId, transaction_id: u64) -> [u8; 40] {
+pub fn get_hash(account: &ActorId, transaction_id: u64) -> TransactionHash {
     let account: [u8; 32] = (*account).into();
     let transaction_id = transaction_id.to_be_bytes();
     let mut hash = [0; 40];
@@ -217,7 +217,7 @@ pub fn get_hash(account: &ActorId, transaction_id: u64) -> [u8; 40] {
     hash
 }
 
-fn send_delayed_clear(transaction_hash: [u8; 40]) {
+fn send_delayed_clear(transaction_hash: TransactionHash) {
     msg::send_delayed(
         exec::program_id(),
         FTokenAction::Clear(transaction_hash),

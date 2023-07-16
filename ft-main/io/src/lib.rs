@@ -13,11 +13,13 @@ impl Metadata for FMainTokenMetadata {
     type State = FTokenState;
 }
 
+pub type TransactionHash = [u8; 40];
+
 #[derive(Default, Encode, Decode, TypeInfo, Debug)]
 pub struct FTokenState {
     pub admin: ActorId,
     pub ft_logic_id: ActorId,
-    pub transactions: Vec<([u8; 40], TransactionStatus)>,
+    pub transactions: Vec<(TransactionHash, TransactionStatus)>,
 }
 
 #[derive(Encode, Decode, TypeInfo, Debug)]
@@ -32,7 +34,7 @@ pub enum FTokenAction {
     },
     GetBalance(ActorId),
     GetPermitId(ActorId),
-    Clear([u8; 40]),
+    Clear(TransactionHash),
     MigrateStorageAddresses,
 }
 
@@ -45,7 +47,7 @@ pub enum FTokenInnerAction {
     },
     GetBalance(ActorId),
     GetPermitId(ActorId),
-    Clear([u8; 40]),
+    Clear(TransactionHash),
     MigrateStorageAddresses,
 }
 

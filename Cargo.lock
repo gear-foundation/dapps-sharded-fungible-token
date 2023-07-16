@@ -1191,6 +1191,7 @@ dependencies = [
 name = "ft-storage"
 version = "2.1.4"
 dependencies = [
+ "ft-main-io",
  "ft-storage-io",
  "gear-wasm-builder",
  "gmeta",
@@ -1203,6 +1204,7 @@ dependencies = [
 name = "ft-storage-io"
 version = "2.1.2"
 dependencies = [
+ "ft-main-io",
  "gmeta",
  "gstd",
  "parity-scale-codec",
