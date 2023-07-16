@@ -69,7 +69,13 @@ async fn send_messages_in_parallel(
         }
     }
 
-    Ok(message_ids)
+    if message_ids.len() > batch_size {
+        Ok(message_ids[message_ids.len() - batch_size..message_ids.len()].to_vec())
+    } else {
+        Ok(message_ids)
+    }
+
+    // Ok(message_ids)
 }
 
 #[tokio::test]
@@ -88,7 +94,7 @@ async fn stress_transfer() -> Result<()> {
 
     let ft_main_wasm = utils::current_wasm();
     let ft_storage_wasm =
-        fs::read("../target/wasm32-unknown-unknown//ft_storage.opt.wasm").unwrap();
+        fs::read("../target/wasm32-unknown-unknown/debug/ft_storage.opt.wasm").unwrap();
     let ft_logic_wasm =
         fs::read("../target/wasm32-unknown-unknown/debug/ft_logic.opt.wasm").unwrap();
 
@@ -106,8 +112,7 @@ async fn stress_transfer() -> Result<()> {
             InitFToken {
                 storage_code_hash: storage_code_id.into_bytes().into(),
                 ft_logic_code_hash: ft_logic_code_id.into_bytes().into(),
-            }
-            .encode(),
+            },
             MAX_GAS_LIMIT,
             0,
         )
@@ -117,7 +122,7 @@ async fn stress_transfer() -> Result<()> {
 
     // Fill program with test users balances
     dbg!("Fill with test users balances");
-    let users_amount = 100;
+    let users_amount = 300_000;
 
     let mut actions: Vec<LogicAction> = vec![];
     for user_id in 0u64..users_amount {
@@ -144,22 +149,23 @@ async fn stress_transfer() -> Result<()> {
         })
         .collect();
 
-    let message_ids = send_messages_in_parallel(&api, BATCH_CHUNK_SIZE, 1, &messages).await?;
+    let message_ids = send_messages_in_parallel(&api, BATCH_CHUNK_SIZE, 1, &messages)
+        .await
+        .unwrap();
 
     // Wait until messages are not processed
     if let Some((msg_id, status)) = listener
         .message_processed_batch(message_ids)
-        .await?
+        .await
+        .unwrap()
         .into_iter()
         .find(|(_, status)| !status.succeed())
     {
-        panic!(
-            "{msg_id:?} ended with error status: {status:?}"
-        );
+        panic!("{msg_id:?} ended with error status: {status:?}");
     };
 
     // Estimate gas for one transfer action
-    let transfers_amount = 1;
+    let transfers_amount = 100;
     dbg!(transfers_amount);
 
     let mut gas_burned = Vec::new();
