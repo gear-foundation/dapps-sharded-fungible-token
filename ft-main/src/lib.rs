@@ -1,9 +1,8 @@
 #![no_std]
 use ft_logic_io::{FTLogicAction, FTLogicEvent, InitFTLogic};
 use ft_main_io::*;
-use gstd::{exec, msg, prelude::*, prog::ProgramGenerator, ActorId};
+use gstd::{exec, msg, prelude::*, prog::ProgramGenerator, ActorId, CodeId};
 use hashbrown::HashMap;
-use primitive_types::H256;
 
 const DELAY: u32 = 600_000;
 
@@ -11,7 +10,7 @@ const DELAY: u32 = 600_000;
 struct FToken {
     admin: ActorId,
     ft_logic_id: ActorId,
-    transactions: HashMap<H256, TransactionStatus>,
+    transactions: HashMap<[u8; 40], TransactionStatus>,
 }
 
 static mut FTOKEN: Option<FToken> = None;
@@ -54,7 +53,7 @@ impl FToken {
         }
     }
 
-    async fn send_message_then_reply(&mut self, transaction_hash: H256, payload: &[u8]) {
+    async fn send_message_then_reply(&mut self, transaction_hash: [u8; 40], payload: &[u8]) {
         let result = self.send_message(transaction_hash, payload).await;
         //debug!("REPLY");
         match result {
@@ -71,7 +70,7 @@ impl FToken {
         };
     }
 
-    async fn send_message(&self, transaction_hash: H256, payload: &[u8]) -> Result<(), ()> {
+    async fn send_message(&self, transaction_hash: [u8; 40], payload: &[u8]) -> Result<(), ()> {
         let result = msg::send_for_reply_as::<_, FTLogicEvent>(
             self.ft_logic_id,
             FTLogicAction::Message {
@@ -122,7 +121,7 @@ impl FToken {
         }
     }
 
-    fn update_logic_contract(&mut self, ft_logic_code_hash: H256, storage_code_hash: H256) {
+    fn update_logic_contract(&mut self, ft_logic_code_hash: CodeId, storage_code_hash: CodeId) {
         self.assert_admin();
         let (_message_id, ft_logic_id) = ProgramGenerator::create_program(
             ft_logic_code_hash.into(),
@@ -144,7 +143,7 @@ impl FToken {
         );
     }
 
-    fn clear(&mut self, transaction_hash: H256) {
+    fn clear(&mut self, transaction_hash: [u8; 40]) {
         self.transactions.remove(&transaction_hash);
     }
 }
@@ -207,13 +206,18 @@ fn reply_err() {
     msg::reply(FTokenEvent::Err, 0).expect("Error in a reply `FTokenEvent::Ok`");
 }
 
-pub fn get_hash(account: &ActorId, transaction_id: u64) -> H256 {
+pub fn get_hash(account: &ActorId, transaction_id: u64) -> [u8; 40] {
     let account: [u8; 32] = (*account).into();
     let transaction_id = transaction_id.to_be_bytes();
-    sp_core_hashing::blake2_256(&[account.as_slice(), transaction_id.as_slice()].concat()).into()
+    let mut hash = [0; 40];
+
+    hash[..32].copy_from_slice(&account);
+    hash[32..].copy_from_slice(&transaction_id);
+
+    hash
 }
 
-fn send_delayed_clear(transaction_hash: H256) {
+fn send_delayed_clear(transaction_hash: [u8; 40]) {
     msg::send_delayed(
         exec::program_id(),
         FTokenAction::Clear(transaction_hash),

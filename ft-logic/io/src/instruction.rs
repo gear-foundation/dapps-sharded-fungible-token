@@ -1,6 +1,5 @@
-use crate::H256;
 use ft_storage_io::{FTStorageAction, FTStorageEvent};
-use gstd::{msg, prelude::*, ActorId};
+use gstd::{msg, prelude::*, ActorId, CodeId};
 
 #[derive(Debug, Encode, Decode, TypeInfo, Clone)]
 pub enum InstructionState {
@@ -87,7 +86,7 @@ impl Instruction {
 }
 
 pub fn create_decrease_instruction(
-    transaction_hash: H256,
+    transaction_hash: [u8; 40],
     msg_source: &ActorId,
     sender_storage: &ActorId,
     sender: &ActorId,
@@ -110,7 +109,7 @@ pub fn create_decrease_instruction(
 }
 
 pub fn create_increase_instruction(
-    transaction_hash: H256,
+    transaction_hash: [u8; 40],
     recipient_storage: &ActorId,
     recipient: &ActorId,
     amount: u128,

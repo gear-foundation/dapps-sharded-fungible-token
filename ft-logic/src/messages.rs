@@ -1,9 +1,8 @@
-use crate::H256;
 use ft_storage_io::{FTStorageAction, FTStorageEvent};
-use gstd::{msg, ActorId};
+use gstd::{msg, ActorId, CodeId};
 
 pub async fn increase_balance(
-    transaction_hash: H256,
+    transaction_hash: [u8; 40],
     storage_id: &ActorId,
     account: &ActorId,
     amount: u128,
@@ -30,7 +29,7 @@ pub async fn increase_balance(
 }
 
 pub async fn decrease_balance(
-    transaction_hash: H256,
+    transaction_hash: [u8; 40],
     storage_id: &ActorId,
     msg_source: &ActorId,
     account: &ActorId,
@@ -59,7 +58,7 @@ pub async fn decrease_balance(
 }
 
 pub async fn approve(
-    transaction_hash: H256,
+    transaction_hash: [u8; 40],
     storage_id: &ActorId,
     msg_source: &ActorId,
     account: &ActorId,
@@ -88,7 +87,7 @@ pub async fn approve(
 }
 
 pub async fn transfer(
-    transaction_hash: H256,
+    transaction_hash: [u8; 40],
     storage_id: &ActorId,
     msg_source: &ActorId,
     sender: &ActorId,
@@ -137,7 +136,7 @@ pub async fn get_permit_id(storage_id: &ActorId, account: &ActorId) -> u128 {
 
 pub async fn check_and_increment_permit_id(
     storage_id: &ActorId,
-    transaction_hash: H256,
+    transaction_hash: [u8; 40],
     account: &ActorId,
     expected_permit_id: u128,
 ) -> bool {

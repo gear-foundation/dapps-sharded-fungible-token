@@ -1,7 +1,6 @@
 #![no_std]
 use gmeta::{InOut, Metadata};
 use gstd::{prelude::*, ActorId};
-use primitive_types::H256;
 
 pub struct FTStorageMetadata;
 
@@ -17,7 +16,7 @@ impl Metadata for FTStorageMetadata {
 #[derive(Default, Encode, Decode, TypeInfo, Debug)]
 pub struct FTStorageState {
     pub ft_logic_id: ActorId,
-    pub transaction_status: Vec<(H256, bool)>,
+    pub transaction_status: Vec<([u8; 40], bool)>,
     pub balances: Vec<(ActorId, u128)>,
     pub approvals: Vec<(ActorId, Vec<(ActorId, u128)>)>,
     pub permits: Vec<(ActorId, u128)>,
@@ -28,29 +27,29 @@ pub enum FTStorageAction {
     GetBalance(ActorId),
     GetPermitId(ActorId),
     IncrementPermitId {
-        transaction_hash: H256,
+        transaction_hash: [u8; 40],
         account: ActorId,
         expected_permit_id: u128,
     },
     IncreaseBalance {
-        transaction_hash: H256,
+        transaction_hash: [u8; 40],
         account: ActorId,
         amount: u128,
     },
     DecreaseBalance {
-        transaction_hash: H256,
+        transaction_hash: [u8; 40],
         msg_source: ActorId,
         account: ActorId,
         amount: u128,
     },
     Approve {
-        transaction_hash: H256,
+        transaction_hash: [u8; 40],
         msg_source: ActorId,
         account: ActorId,
         amount: u128,
     },
     Transfer {
-        transaction_hash: H256,
+        transaction_hash: [u8; 40],
         msg_source: ActorId,
         sender: ActorId,
         recipient: ActorId,
