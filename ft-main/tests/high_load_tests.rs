@@ -29,7 +29,6 @@ fn high_load_mint() {
     }
 }
 
-#[ignore]
 #[test]
 fn high_load_transfer() {
     const FIRST_ID: u64 = 100;
