@@ -19,7 +19,6 @@ struct FTLogic {
     transaction_status: HashMap<H256, TransactionStatus>,
     instructions: HashMap<H256, (Instruction, Instruction)>,
     storage_code_hash: H256,
-    // id_to_storage: HashMap<String, ActorId>,
     id_to_storage: [Option<ActorId>; 16],
 }
 
@@ -338,8 +337,6 @@ impl FTLogic {
     }
 
     fn get_storage_address(&mut self, address: &ActorId) -> ActorId {
-        // let encoded = hex::encode(address.as_ref()[0..=0]);
-        // let id: String = encoded.chars().next().expect("Can't be None").to_string();
         let id = Self::get_id_for_account(address);
         if let Some(ref address) = self.id_to_storage[id] {
             *address
@@ -357,8 +354,6 @@ impl FTLogic {
     }
 
     async fn get_permit_id(&self, account: &ActorId) {
-        // let encoded = hex::encode(account.as_ref()[0..=0]);
-        // let id: String = encoded.chars().next().expect("Can't be None").to_string();
         let id = Self::get_id_for_account(account);
         if let Some(ref address) = self.id_to_storage[id] {
             let permit_id = get_permit_id(address, account).await;
@@ -376,8 +371,6 @@ impl FTLogic {
         account: &ActorId,
         expected_id: &u128,
     ) -> bool {
-        // let encoded = hex::encode(account.as_ref()[0..=0]);
-        // let id: String = encoded.chars().next().expect("Can't be None").to_string();
         let id = Self::get_id_for_account(account);
         if let Some(ref address) = self.id_to_storage[id] {
             return check_and_increment_permit_id(address, transaction_hash, account, *expected_id)
@@ -387,8 +380,6 @@ impl FTLogic {
     }
 
     async fn get_balance(&self, account: &ActorId) {
-        // let encoded = hex::encode(account.as_ref()[0..=0]);
-        // let id: String = encoded.chars().next().expect("Can't be None").to_string();
         let id = Self::get_id_for_account(account);
         if let Some(ref address) = self.id_to_storage[id] {
             let balance = get_balance(address, account).await;
@@ -488,12 +479,7 @@ extern "C" fn state() {
             .map(|(key, value)| (*key, value.clone()))
             .collect(),
         storage_code_hash: logic.storage_code_hash,
-        id_to_storage: logic
-            .id_to_storage
-            // .iter()
-            // .enumerate()
-            // .map(|(key, value)| (key as u8, *value))
-            // .collect(),
+        id_to_storage: logic.id_to_storage,
     };
     msg::reply(logic_state, 0).expect("Failed to share state");
 }
