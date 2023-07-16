@@ -19,7 +19,8 @@ struct FTLogic {
     transaction_status: HashMap<H256, TransactionStatus>,
     instructions: HashMap<H256, (Instruction, Instruction)>,
     storage_code_hash: H256,
-    id_to_storage: HashMap<String, ActorId>,
+    // id_to_storage: HashMap<String, ActorId>,
+    id_to_storage: [Option<ActorId>; 16],
 }
 
 static mut FT_LOGIC: Option<FTLogic> = None;
@@ -333,9 +334,10 @@ impl FTLogic {
     }
 
     fn get_storage_address(&mut self, address: &ActorId) -> ActorId {
-        let encoded = hex::encode(address.as_ref()[0..=0]);
-        let id: String = encoded.chars().next().expect("Can't be None").to_string();
-        if let Some(address) = self.id_to_storage.get(&id) {
+        // let encoded = hex::encode(address.as_ref()[0..=0]);
+        // let id: String = encoded.chars().next().expect("Can't be None").to_string();
+        let id = (address.as_ref()[0] / 16) as usize;
+        if let Some(ref address) = self.id_to_storage[id] {
             *address
         } else {
             let (_message_id, address) = ProgramGenerator::create_program_with_gas(
@@ -345,15 +347,16 @@ impl FTLogic {
                 0,
             )
             .expect("Error in creating Storage program");
-            self.id_to_storage.insert(id, address);
+            self.id_to_storage[id] = Some(address);
             address
         }
     }
 
     async fn get_permit_id(&self, account: &ActorId) {
-        let encoded = hex::encode(account.as_ref()[0..=0]);
-        let id: String = encoded.chars().next().expect("Can't be None").to_string();
-        if let Some(address) = self.id_to_storage.get(&id) {
+        // let encoded = hex::encode(account.as_ref()[0..=0]);
+        // let id: String = encoded.chars().next().expect("Can't be None").to_string();
+        let id = (account.as_ref()[0] / 16) as usize;
+        if let Some(ref address) = self.id_to_storage[id] {
             let permit_id = get_permit_id(address, account).await;
             msg::reply(FTLogicEvent::PermitId(permit_id), 0)
                 .expect("Error in a reply `FTLogicEvent::PermitId`");
@@ -369,9 +372,10 @@ impl FTLogic {
         account: &ActorId,
         expected_id: &u128,
     ) -> bool {
-        let encoded = hex::encode(account.as_ref()[0..=0]);
-        let id: String = encoded.chars().next().expect("Can't be None").to_string();
-        if let Some(address) = self.id_to_storage.get(&id) {
+        // let encoded = hex::encode(account.as_ref()[0..=0]);
+        // let id: String = encoded.chars().next().expect("Can't be None").to_string();
+        let id = (account.as_ref()[0] / 16) as usize;
+        if let Some(ref address) = self.id_to_storage[id] {
             return check_and_increment_permit_id(address, transaction_hash, account, *expected_id)
                 .await;
         }
@@ -379,9 +383,10 @@ impl FTLogic {
     }
 
     async fn get_balance(&self, account: &ActorId) {
-        let encoded = hex::encode(account.as_ref()[0..=0]);
-        let id: String = encoded.chars().next().expect("Can't be None").to_string();
-        if let Some(address) = self.id_to_storage.get(&id) {
+        // let encoded = hex::encode(account.as_ref()[0..=0]);
+        // let id: String = encoded.chars().next().expect("Can't be None").to_string();
+        let id = (account.as_ref()[0] / 16) as usize;
+        if let Some(ref address) = self.id_to_storage[id] {
             let balance = get_balance(address, account).await;
             msg::reply(FTLogicEvent::Balance(balance), 0)
                 .expect("Error in a reply `FTLogicEvent::Balance`");
@@ -482,7 +487,8 @@ extern "C" fn state() {
         id_to_storage: logic
             .id_to_storage
             .iter()
-            .map(|(key, value)| (key.clone(), *value))
+            .enumerate()
+            .map(|(key, value)| (key as u8, *value))
             .collect(),
     };
     msg::reply(logic_state, 0).expect("Failed to share state");
