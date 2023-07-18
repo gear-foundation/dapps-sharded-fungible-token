@@ -1,8 +1,7 @@
 #![no_std]
-use ft_main_io::LogicAction;
+use ft_main_io::{LogicAction, TransactionHash};
 use gmeta::{In, InOut, Metadata};
-use gstd::{prelude::*, ActorId};
-use primitive_types::H256;
+use gstd::{prelude::*, ActorId, CodeId};
 pub struct FLogicMetadata;
 pub mod instruction;
 use instruction::Instruction;
@@ -15,14 +14,13 @@ impl Metadata for FLogicMetadata {
     type Signal = ();
     type State = FTLogicState;
 }
-
 #[derive(Encode, Decode, TypeInfo, Debug)]
 pub struct FTLogicState {
     pub admin: ActorId,
     pub ftoken_id: ActorId,
-    pub transaction_status: Vec<(H256, TransactionStatus)>,
-    pub instructions: Vec<(H256, (Instruction, Instruction))>,
-    pub storage_code_hash: H256,
+    pub transaction_status: Vec<(TransactionHash, TransactionStatus)>,
+    pub instructions: Vec<(TransactionHash, (Instruction, Instruction))>,
+    pub storage_code_hash: CodeId,
     pub id_to_storage: Vec<(String, ActorId)>,
 }
 
@@ -36,14 +34,14 @@ pub enum TransactionStatus {
 #[derive(Debug, Encode, Decode, TypeInfo, Clone)]
 pub enum FTLogicAction {
     Message {
-        transaction_hash: H256,
+        transaction_hash: TransactionHash,
         account: ActorId,
         payload: Vec<u8>,
     },
     GetBalance(ActorId),
     GetPermitId(ActorId),
-    Clear(H256),
-    UpdateStorageCodeHash(H256),
+    Clear(TransactionHash),
+    UpdateStorageCodeHash(CodeId),
     MigrateStorages,
 }
 
@@ -66,5 +64,5 @@ pub struct PermitUnsigned {
 #[derive(Encode, Decode, TypeInfo)]
 pub struct InitFTLogic {
     pub admin: ActorId,
-    pub storage_code_hash: H256,
+    pub storage_code_hash: CodeId,
 }

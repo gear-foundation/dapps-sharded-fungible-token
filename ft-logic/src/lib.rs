@@ -1,13 +1,13 @@
 #![no_std]
 use ft_logic_io::instruction::*;
 use ft_logic_io::*;
-use ft_main_io::LogicAction;
-use gstd::{exec, msg, prelude::*, prog::ProgramGenerator, ActorId};
+use ft_main_io::{LogicAction, TransactionHash};
+use gstd::{exec, msg, prelude::*, prog::ProgramGenerator, ActorId, CodeId};
 
 mod messages;
 use hashbrown::HashMap;
 use messages::*;
-use primitive_types::{H256, H512};
+use primitive_types::H512;
 
 const GAS_STORAGE_CREATION: u64 = 3_000_000_000;
 const DELAY: u32 = 600_000;
@@ -16,9 +16,9 @@ const DELAY: u32 = 600_000;
 struct FTLogic {
     admin: ActorId,
     ftoken_id: ActorId,
-    transaction_status: HashMap<H256, TransactionStatus>,
-    instructions: HashMap<H256, (Instruction, Instruction)>,
-    storage_code_hash: H256,
+    transaction_status: HashMap<TransactionHash, TransactionStatus>,
+    instructions: HashMap<TransactionHash, (Instruction, Instruction)>,
+    storage_code_hash: CodeId,
     id_to_storage: HashMap<String, ActorId>,
 }
 
@@ -31,7 +31,12 @@ impl FTLogic {
     /// * `transaction_hash`: the hash associated with that transaction;
     /// * `account`: the account that sent the message to the main contract;
     /// * `action`: the message payload.
-    async fn message(&mut self, transaction_hash: H256, account: &ActorId, payload: &[u8]) {
+    async fn message(
+        &mut self,
+        transaction_hash: TransactionHash,
+        account: &ActorId,
+        payload: &[u8],
+    ) {
         self.assert_main_contract();
         let action = LogicAction::decode(&mut &payload[..]).expect("Can't decode `Action`");
 
@@ -100,7 +105,7 @@ impl FTLogic {
         }
     }
 
-    async fn mint(&mut self, transaction_hash: H256, recipient: &ActorId, amount: u128) {
+    async fn mint(&mut self, transaction_hash: TransactionHash, recipient: &ActorId, amount: u128) {
         let recipient_storage = self.get_storage_address(recipient);
 
         let result =
@@ -122,7 +127,7 @@ impl FTLogic {
 
     async fn burn(
         &mut self,
-        transaction_hash: H256,
+        transaction_hash: TransactionHash,
         account: &ActorId,
         sender: &ActorId,
         amount: u128,
@@ -148,7 +153,7 @@ impl FTLogic {
 
     async fn transfer(
         &mut self,
-        transaction_hash: H256,
+        transaction_hash: TransactionHash,
         msg_source: &ActorId,
         sender: &ActorId,
         recipient: &ActorId,
@@ -214,7 +219,7 @@ impl FTLogic {
 
     async fn transfer_single_storage(
         &mut self,
-        transaction_hash: H256,
+        transaction_hash: TransactionHash,
         storage_id: &ActorId,
         msg_source: &ActorId,
         sender: &ActorId,
@@ -247,7 +252,7 @@ impl FTLogic {
 
     async fn approve(
         &mut self,
-        transaction_hash: H256,
+        transaction_hash: TransactionHash,
         account: &ActorId,
         approved_account: &ActorId,
         amount: u128,
@@ -286,7 +291,7 @@ impl FTLogic {
 
     async fn permit(
         &mut self,
-        transaction_hash: H256,
+        transaction_hash: TransactionHash,
         owner: &ActorId,
         spender: &ActorId,
         amount: u128,
@@ -327,7 +332,7 @@ impl FTLogic {
         }
     }
 
-    fn update_storage_hash(&mut self, storage_code_hash: H256) {
+    fn update_storage_hash(&mut self, storage_code_hash: CodeId) {
         self.assert_admin();
         self.storage_code_hash = storage_code_hash;
     }
@@ -365,7 +370,7 @@ impl FTLogic {
 
     async fn check_and_increment_permit_id(
         &self,
-        transaction_hash: H256,
+        transaction_hash: TransactionHash,
         account: &ActorId,
         expected_id: &u128,
     ) -> bool {
@@ -391,7 +396,7 @@ impl FTLogic {
         }
     }
 
-    fn clear(&mut self, transaction_hash: H256) {
+    fn clear(&mut self, transaction_hash: TransactionHash) {
         self.transaction_status.remove(&transaction_hash);
     }
 
@@ -452,7 +457,7 @@ fn reply_ok() {
     msg::reply(FTLogicEvent::Ok, 0).expect("Error in sending a reply `FTLogicEvent::Ok`");
 }
 
-fn send_delayed_clear(transaction_hash: H256) {
+fn send_delayed_clear(transaction_hash: TransactionHash) {
     msg::send_delayed(
         exec::program_id(),
         FTLogicAction::Clear(transaction_hash),

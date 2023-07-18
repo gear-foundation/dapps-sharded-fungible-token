@@ -1,13 +1,13 @@
 #![no_std]
+use ft_main_io::TransactionHash;
 use ft_storage_io::*;
 use gstd::{msg, prelude::*, ActorId};
 use hashbrown::HashMap;
-use primitive_types::H256;
 
 #[derive(Default)]
 struct FTStorage {
     ft_logic_id: ActorId,
-    transaction_status: HashMap<H256, bool>,
+    transaction_status: HashMap<TransactionHash, bool>,
     balances: HashMap<ActorId, u128>,
     approvals: HashMap<ActorId, HashMap<ActorId, u128>>,
     permits: HashMap<ActorId, u128>,
@@ -23,7 +23,7 @@ impl FTStorage {
 
     fn check_and_increment_permit_id(
         &mut self,
-        transaction_hash: H256,
+        transaction_hash: TransactionHash,
         account: &ActorId,
         signed_permit_id: &u128,
     ) {
@@ -78,7 +78,7 @@ impl FTStorage {
     }
     fn transfer(
         &mut self,
-        transaction_hash: H256,
+        transaction_hash: TransactionHash,
         msg_source: &ActorId,
         sender: &ActorId,
         recipient: &ActorId,
@@ -112,7 +112,12 @@ impl FTStorage {
         }
     }
 
-    fn increase_balance(&mut self, transaction_hash: H256, account: &ActorId, amount: u128) {
+    fn increase_balance(
+        &mut self,
+        transaction_hash: TransactionHash,
+        account: &ActorId,
+        amount: u128,
+    ) {
         self.assert_ft_contract();
 
         // check transaction status
@@ -136,7 +141,7 @@ impl FTStorage {
 
     fn decrease_balance(
         &mut self,
-        transaction_hash: H256,
+        transaction_hash: TransactionHash,
         msg_source: &ActorId,
         account: &ActorId,
         amount: u128,
@@ -166,7 +171,7 @@ impl FTStorage {
 
     fn approve(
         &mut self,
-        transaction_hash: H256,
+        transaction_hash: TransactionHash,
         msg_source: &ActorId,
         account: &ActorId,
         amount: u128,

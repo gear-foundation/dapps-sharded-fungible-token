@@ -10,6 +10,7 @@ gstd.workspace = true
 ft-storage-io.workspace = true
 primitive-types.workspace = true
 hashbrown.workspace = true
+ft-main-io.workspace = true
 
 [build-dependencies]
 gmeta.workspace = true

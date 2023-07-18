@@ -1,7 +1,7 @@
 #![no_std]
 use gmeta::{In, InOut, Metadata};
-use gstd::{prelude::*, ActorId};
-use primitive_types::{H256, H512};
+use gstd::{prelude::*, ActorId, CodeId};
+use primitive_types::H512;
 pub struct FMainTokenMetadata;
 
 impl Metadata for FMainTokenMetadata {
@@ -13,11 +13,13 @@ impl Metadata for FMainTokenMetadata {
     type State = FTokenState;
 }
 
+pub type TransactionHash = [u8; 40];
+
 #[derive(Default, Encode, Decode, TypeInfo, Debug)]
 pub struct FTokenState {
     pub admin: ActorId,
     pub ft_logic_id: ActorId,
-    pub transactions: Vec<(H256, TransactionStatus)>,
+    pub transactions: Vec<(TransactionHash, TransactionStatus)>,
 }
 
 #[derive(Encode, Decode, TypeInfo, Debug)]
@@ -27,12 +29,12 @@ pub enum FTokenAction {
         payload: LogicAction,
     },
     UpdateLogicContract {
-        ft_logic_code_hash: H256,
-        storage_code_hash: H256,
+        ft_logic_code_hash: CodeId,
+        storage_code_hash: CodeId,
     },
     GetBalance(ActorId),
     GetPermitId(ActorId),
-    Clear(H256),
+    Clear(TransactionHash),
     MigrateStorageAddresses,
 }
 
@@ -40,12 +42,12 @@ pub enum FTokenAction {
 pub enum FTokenInnerAction {
     Message(Vec<u8>),
     UpdateLogicContract {
-        ft_logic_code_hash: H256,
-        storage_code_hash: H256,
+        ft_logic_code_hash: CodeId,
+        storage_code_hash: CodeId,
     },
     GetBalance(ActorId),
     GetPermitId(ActorId),
-    Clear(H256),
+    Clear(TransactionHash),
     MigrateStorageAddresses,
 }
 
@@ -87,8 +89,8 @@ pub enum FTokenEvent {
 
 #[derive(Encode, Decode, TypeInfo)]
 pub struct InitFToken {
-    pub storage_code_hash: H256,
-    pub ft_logic_code_hash: H256,
+    pub storage_code_hash: CodeId,
+    pub ft_logic_code_hash: CodeId,
 }
 
 #[derive(Encode, Decode, TypeInfo, Copy, Clone, Debug)]
