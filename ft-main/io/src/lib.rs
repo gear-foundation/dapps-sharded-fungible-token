@@ -1,7 +1,7 @@
 #![no_std]
 use gmeta::{In, InOut, Metadata};
 use gstd::{prelude::*, ActorId, CodeId};
-use primitive_types::{H512};
+use primitive_types::H512;
 pub struct FMainTokenMetadata;
 
 impl Metadata for FMainTokenMetadata {

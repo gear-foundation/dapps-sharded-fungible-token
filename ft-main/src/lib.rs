@@ -70,7 +70,11 @@ impl FToken {
         };
     }
 
-    async fn send_message(&self, transaction_hash: TransactionHash, payload: &[u8]) -> Result<(), ()> {
+    async fn send_message(
+        &self,
+        transaction_hash: TransactionHash,
+        payload: &[u8],
+    ) -> Result<(), ()> {
         let result = msg::send_for_reply_as::<_, FTLogicEvent>(
             self.ft_logic_id,
             FTLogicAction::Message {

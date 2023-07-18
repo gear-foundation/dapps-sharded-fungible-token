@@ -7,7 +7,7 @@ use gstd::{exec, msg, prelude::*, prog::ProgramGenerator, ActorId, CodeId};
 mod messages;
 use hashbrown::HashMap;
 use messages::*;
-use primitive_types::{H512};
+use primitive_types::H512;
 
 const GAS_STORAGE_CREATION: u64 = 3_000_000_000;
 const DELAY: u32 = 600_000;
@@ -31,7 +31,12 @@ impl FTLogic {
     /// * `transaction_hash`: the hash associated with that transaction;
     /// * `account`: the account that sent the message to the main contract;
     /// * `action`: the message payload.
-    async fn message(&mut self, transaction_hash: TransactionHash, account: &ActorId, payload: &[u8]) {
+    async fn message(
+        &mut self,
+        transaction_hash: TransactionHash,
+        account: &ActorId,
+        payload: &[u8],
+    ) {
         self.assert_main_contract();
         let action = LogicAction::decode(&mut &payload[..]).expect("Can't decode `Action`");
 

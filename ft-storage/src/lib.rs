@@ -112,7 +112,12 @@ impl FTStorage {
         }
     }
 
-    fn increase_balance(&mut self, transaction_hash: TransactionHash, account: &ActorId, amount: u128) {
+    fn increase_balance(
+        &mut self,
+        transaction_hash: TransactionHash,
+        account: &ActorId,
+        amount: u128,
+    ) {
         self.assert_ft_contract();
 
         // check transaction status
