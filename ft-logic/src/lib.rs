@@ -332,7 +332,7 @@ impl FTLogic {
         self.storage_code_hash = storage_code_hash;
     }
 
-    fn get_id_for_account(account: &ActorId) -> usize{
+    fn get_id_for_account(account: &ActorId) -> usize {
         (account.as_ref()[0] / 16) as usize
     }
 
