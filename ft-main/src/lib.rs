@@ -151,29 +151,22 @@ impl FToken {
 
 #[gstd::async_main]
 async fn main() {
-    let bytes = msg::load_bytes().expect("Unable to load bytes");
+    let action: FTokenAction = msg::load().expect("Error in load decode");
     let ftoken: &mut FToken = unsafe { FTOKEN.as_mut().expect("The contract is not initialized") };
 
-    if bytes[0] == 0 {
-        let array: [u8; 8] = bytes[1..=8]
-            .try_into()
-            .expect("Unable to get an array from slice");
-        let transaction_id = u64::from_ne_bytes(array);
-        let payload: Vec<u8> = bytes[9..].to_vec();
-        ftoken.message(transaction_id, &payload).await;
-    } else {
-        let action = FTokenInnerAction::decode(&mut &bytes[..])
-            .expect("Unable to decode `FTokenInnerAction`");
-        match action {
-            FTokenInnerAction::UpdateLogicContract {
-                ft_logic_code_hash,
-                storage_code_hash,
-            } => ftoken.update_logic_contract(ft_logic_code_hash, storage_code_hash),
-            FTokenInnerAction::Clear(transaction_hash) => ftoken.clear(transaction_hash),
-            FTokenInnerAction::GetBalance(account) => ftoken.get_balance(&account).await,
-            FTokenInnerAction::GetPermitId(account) => ftoken.get_permit_id(&account).await,
-            _ => {}
-        }
+    match action {
+        FTokenAction::Message {
+            transaction_id,
+            payload,
+        } => ftoken.message(transaction_id, &payload).await,
+        FTokenAction::UpdateLogicContract {
+            ft_logic_code_hash,
+            storage_code_hash,
+        } => ftoken.update_logic_contract(ft_logic_code_hash, storage_code_hash),
+        FTokenAction::Clear(transaction_hash) => ftoken.clear(transaction_hash),
+        FTokenAction::GetBalance(account) => ftoken.get_balance(&account).await,
+        FTokenAction::GetPermitId(account) => ftoken.get_permit_id(&account).await,
+        _ => {}
     }
 }
 

@@ -1,7 +1,6 @@
 #![no_std]
 use ft_logic_io::instruction::*;
 use ft_logic_io::*;
-use ft_main_io::LogicAction;
 use gstd::{exec, msg, prelude::*, prog::ProgramGenerator, ActorId};
 
 mod messages;
