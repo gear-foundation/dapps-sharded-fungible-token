@@ -155,7 +155,10 @@ async fn main() {
     let ftoken: &mut FToken = unsafe { FTOKEN.as_mut().expect("The contract is not initialized") };
 
     match action {
-        FTokenAction::Message { transaction_id, payload } => ftoken.message(transaction_id, &payload).await,
+        FTokenAction::Message {
+            transaction_id,
+            payload,
+        } => ftoken.message(transaction_id, &payload).await,
         FTokenAction::UpdateLogicContract {
             ft_logic_code_hash,
             storage_code_hash,
@@ -163,7 +166,7 @@ async fn main() {
         FTokenAction::Clear(transaction_hash) => ftoken.clear(transaction_hash),
         FTokenAction::GetBalance(account) => ftoken.get_balance(&account).await,
         FTokenAction::GetPermitId(account) => ftoken.get_permit_id(&account).await,
-        _ => {},
+        _ => {}
     }
 }
 

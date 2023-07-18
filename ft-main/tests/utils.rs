@@ -1,5 +1,5 @@
+use ft_logic_io::LogicAction;
 use ft_main_io::*;
-use ft_logic_io::{LogicAction};
 use gstd::{prelude::*, ActorId};
 use gtest::{Log, Program, System};
 use sp_core::sr25519::Signature;
@@ -71,7 +71,8 @@ impl FToken for Program<'_> {
         let payload = LogicAction::Mint {
             recipient: account.into(),
             amount,
-        }.encode();
+        }
+        .encode();
         self.send_message_and_check_res(
             from,
             FTokenAction::Message {
@@ -86,7 +87,8 @@ impl FToken for Program<'_> {
         let payload = LogicAction::Burn {
             sender: account.into(),
             amount,
-        }.encode();
+        }
+        .encode();
         self.send_message_and_check_res(
             from,
             FTokenAction::Message {
@@ -110,7 +112,8 @@ impl FToken for Program<'_> {
             sender: sender.into(),
             recipient: recipient.into(),
             amount,
-        }.encode();
+        }
+        .encode();
         self.send_message_and_check_res(
             from,
             FTokenAction::Message {
@@ -132,7 +135,8 @@ impl FToken for Program<'_> {
         let payload = LogicAction::Approve {
             approved_account: approved_account.into(),
             amount,
-        }.encode();
+        }
+        .encode();
         self.send_message_and_check_res(
             from,
             FTokenAction::Message {
@@ -160,7 +164,8 @@ impl FToken for Program<'_> {
             amount,
             permit_id,
             sign: sign.into(),
-        }.encode();
+        }
+        .encode();
         self.send_message_and_check_res(
             from,
             FTokenAction::Message {
