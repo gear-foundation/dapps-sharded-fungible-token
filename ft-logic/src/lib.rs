@@ -338,8 +338,8 @@ impl FTLogic {
 
     fn get_storage_address(&mut self, address: &ActorId) -> ActorId {
         let id = Self::get_id_for_account(address);
-        if let Some(ref address) = self.id_to_storage[id] {
-            *address
+        if let Some(address) = self.id_to_storage[id] {
+            address
         } else {
             let (_message_id, address) = ProgramGenerator::create_program_with_gas(
                 self.storage_code_hash.into(),
