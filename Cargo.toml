@@ -17,7 +17,7 @@ gear-wasm-builder = { git = "https://github.com/gear-tech/gear", rev = "946ac47"
 gclient = { git = "https://github.com/gear-tech/gear", rev = "946ac47" }
 gtest = { git = "https://github.com/gear-tech/gear", rev = "946ac47" }
 gmeta = { git = "https://github.com/gear-tech/gear", rev = "946ac47" }
-gstd-fluent = { git = "https://github.com/gear-foundation/gstd-fluent.git" }
+gstd-fluent = { git = "https://github.com/gear-foundation/gstd-fluent.git", branch = "minor-fixes" }
 light_sr25519 = { git = "https://github.com/gear-tech/gear", rev = "946ac47" }
 gear-lib = { git = "https://github.com/gear-dapps/gear-lib", tag = "0.3.9" }
 sp-core = { git = "https://github.com/gear-tech/substrate", rev = "36699c4" }
