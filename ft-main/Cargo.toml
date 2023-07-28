@@ -22,7 +22,7 @@ gclient.workspace = true
 tokio.workspace = true
 light_sr25519.workspace = true
 sp-core.workspace = true
-hex-literal = "0.3.4"
+hex-literal = "0.4.1"
 
 [build-dependencies]
 gear-wasm-builder.workspace = true
