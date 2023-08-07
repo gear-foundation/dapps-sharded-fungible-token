@@ -1677,7 +1677,7 @@ dependencies = [
 [[package]]
 name = "gstd-fluent"
 version = "0.1.0"
-source = "git+https://github.com/gear-foundation/gstd-fluent.git?branch=minor-fixes#05213f0d0067641689ec780e12222252b11a2279"
+source = "git+https://github.com/gear-foundation/gstd-fluent.git#12cd77b29fcc369c23e2b4bb232b0d0746ffd68e"
 dependencies = [
  "gstd",
 ]
