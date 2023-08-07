@@ -1,6 +1,6 @@
 pub mod utils;
 use ft_logic_io::PermitUnsigned;
-use gstd::Encode;
+use gstd_fluent::gstd::Encode;
 use gtest::{Program, System};
 use hex_literal::hex;
 use sp_core::{sr25519::Pair as Sr25519Pair, Pair};

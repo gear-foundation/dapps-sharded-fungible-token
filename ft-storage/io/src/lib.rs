@@ -1,6 +1,6 @@
 #![no_std]
 use gmeta::{InOut, Metadata};
-use gstd::{prelude::*, ActorId};
+use gstd_fluent::gstd::{prelude::*, ActorId};
 use primitive_types::H256;
 
 pub struct FTStorageMetadata;

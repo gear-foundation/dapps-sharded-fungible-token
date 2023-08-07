@@ -1130,7 +1130,7 @@ dependencies = [
  "ft-storage-io",
  "gear-wasm-builder",
  "gmeta",
- "gstd",
+ "gstd-fluent",
  "gtest",
  "hashbrown 0.14.0",
  "hex",
@@ -1148,7 +1148,7 @@ dependencies = [
  "ft-main-io",
  "ft-storage-io",
  "gmeta",
- "gstd",
+ "gstd-fluent",
  "hashbrown 0.14.0",
  "parity-scale-codec",
  "primitive-types",
@@ -1165,7 +1165,7 @@ dependencies = [
  "gclient",
  "gear-wasm-builder",
  "gmeta",
- "gstd",
+ "gstd-fluent",
  "gtest",
  "hashbrown 0.14.0",
  "hex-literal",
@@ -1181,7 +1181,7 @@ name = "ft-main-io"
 version = "2.1.4"
 dependencies = [
  "gmeta",
- "gstd",
+ "gstd-fluent",
  "parity-scale-codec",
  "primitive-types",
  "scale-info",
@@ -1194,7 +1194,7 @@ dependencies = [
  "ft-storage-io",
  "gear-wasm-builder",
  "gmeta",
- "gstd",
+ "gstd-fluent",
  "hashbrown 0.14.0",
  "primitive-types",
 ]
@@ -1204,7 +1204,7 @@ name = "ft-storage-io"
 version = "2.1.2"
 dependencies = [
  "gmeta",
- "gstd",
+ "gstd-fluent",
  "parity-scale-codec",
  "primitive-types",
  "scale-info",
@@ -1672,6 +1672,14 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.25",
+]
+
+[[package]]
+name = "gstd-fluent"
+version = "0.1.0"
+source = "git+https://github.com/gear-foundation/gstd-fluent.git#12cd77b29fcc369c23e2b4bb232b0d0746ffd68e"
+dependencies = [
+ "gstd",
 ]
 
 [[package]]
@@ -4579,7 +4587,7 @@ checksum = "97fee6b57c6a41524a810daee9286c02d7752c4253064d0b05472833a438f675"
 dependencies = [
  "cfg-if",
  "digest 0.10.7",
- "rand 0.8.5",
+ "rand 0.7.3",
  "static_assertions",
 ]
 

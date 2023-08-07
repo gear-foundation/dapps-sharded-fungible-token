@@ -1,6 +1,9 @@
 use crate::H256;
 use ft_storage_io::{FTStorageAction, FTStorageEvent};
-use gstd::{msg, prelude::*, ActorId};
+use gstd_fluent::{
+    self as builder,
+    gstd::{prelude::*, ActorId},
+};
 
 #[derive(Debug, Encode, Decode, TypeInfo, Clone)]
 pub enum InstructionState {
@@ -36,14 +39,11 @@ impl Instruction {
     pub async fn start(&mut self) -> Result<(), ()> {
         match self.state {
             InstructionState::ScheduledRun => {
-                let result = msg::send_for_reply_as::<_, FTStorageEvent>(
-                    self.address,
-                    self.transaction,
-                    0,
-                    0,
-                )
-                .expect("Error in sending a message in instruction")
-                .await;
+                let result = builder::send(self.address, self.transaction)
+                    .for_reply_as::<FTStorageEvent>()
+                    .execute()
+                    .expect("Error in sending a message in instruction")
+                    .await;
                 match result {
                     Ok(FTStorageEvent::Ok) => {
                         self.state = InstructionState::ScheduledAbort;
@@ -63,15 +63,14 @@ impl Instruction {
     pub async fn abort(&mut self) -> Result<(), ()> {
         match self.state {
             InstructionState::ScheduledAbort => {
-                let result = msg::send_for_reply_as::<_, FTStorageEvent>(
-                    self.address,
-                    self.compensation
-                        .expect("No compensation for that instruction"),
-                    0,
-                    0,
-                )
-                .expect("Error in sending a compensation message in instruction")
-                .await;
+                let compensation = self
+                    .compensation
+                    .expect("No compensation for that instruction");
+                let result = builder::send(self.address, compensation)
+                    .for_reply_as::<FTStorageEvent>()
+                    .execute()
+                    .expect("Error in sending a compensation message in instruction")
+                    .await;
                 match result {
                     Ok(FTStorageEvent::Ok) => {
                         self.state = InstructionState::Finished;

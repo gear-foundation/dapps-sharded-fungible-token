@@ -6,7 +6,7 @@ license.workspace = true
 authors.workspace = true
 
 [dependencies]
-gstd.workspace = true
+gstd-fluent.workspace = true
 ft-main-io.workspace = true
 ft-logic-io.workspace = true
 ft-storage-io.workspace = true
@@ -17,7 +17,7 @@ sp-core-hashing = { version = "8.0.0", default-features = false }
 
 [dev-dependencies]
 gtest.workspace = true
-gstd = { workspace = true, features = ["debug"] }
+gstd-fluent = { workspace = true, features = ["debug"] }
 gclient.workspace = true
 tokio.workspace = true
 light_sr25519.workspace = true
