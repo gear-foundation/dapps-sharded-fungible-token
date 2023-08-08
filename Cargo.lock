@@ -1172,7 +1172,7 @@ dependencies = [
  "light_sr25519",
  "primitive-types",
  "sp-core 7.0.0 (git+https://github.com/gear-tech/substrate?rev=36699c4)",
- "sp-core-hashing 8.0.0",
+ "sp-core-hashing 10.0.0",
  "tokio",
 ]
 
@@ -3680,16 +3680,15 @@ dependencies = [
 
 [[package]]
 name = "sp-core-hashing"
-version = "8.0.0"
+version = "10.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "27449abdfbe41b473e625bce8113745e81d65777dd1d5a8462cf24137930dad8"
+checksum = "e360755a2706a76886d58776665cad0db793dece3c7d390455b28e8a1efd6285"
 dependencies = [
  "blake2b_simd",
  "byteorder",
  "digest 0.10.7",
  "sha2 0.10.7",
  "sha3",
- "sp-std 7.0.0",
  "twox-hash",
 ]
 
@@ -3936,12 +3935,6 @@ source = "git+https://github.com/gear-tech/substrate.git?branch=gear-polkadot-v0
 name = "sp-std"
 version = "5.0.0"
 source = "git+https://github.com/gear-tech/substrate?rev=36699c4#36699c4478ce8ae05517bb42a1b115403313e083"
-
-[[package]]
-name = "sp-std"
-version = "7.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1de8eef39962b5b97478719c493bed2926cf70cb621005bbf68ebe58252ff986"
 
 [[package]]
 name = "sp-storage"
